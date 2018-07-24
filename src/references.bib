@@ -8,13 +8,13 @@
     doi={10.1109/SCC.2006.116},
     month={Sept}
 }
-@online{perrin2008,
-    author={C. Perrin},
-    title={The CIA Triad},
-    year={2008},
-    url={http://www.techrepublic.com/blog/it-security/the-cia-triad/},
-    urldate={2017-04-12}
-}
+@book{nist2003, 
+    place={Gaithersburg, MD}, 
+    title={Standards for Security Categorization of Federal Information and Information Systems}, 
+    publisher={Computer Security Division, Information Technology Laboratory, National Institute of Standards and Technology}, 
+    author={Evans, Donald and Bond, Philips and Bement, Arden}, 
+    year={2003}
+} 
 @book{parker1998,
     place={New York},
     title={Fighting Computer Crime: a New Framework for Protecting Information},
@@ -33,20 +33,10 @@
     year = {2015},
     file = {Guide-to-Computer-Network-Security-3rd-Edition-2015.pdf:/media/Fikri/TA/storage/QJT6BUQI/Guide-to-Computer-Network-Security-3rd-Edition-2015.pdf:application/pdf}
 }
-@misc{owasp2013,
-    year={2013},
-    title={OWASP Top 10 2013},
-    url={https://www.owasp.org/index.php/Top_10_2013-Top_10},
-    publisher={OWASP}
-}
-@misc{snort,
-    title={Snort Users Manual},
-    url={http://manual-snort-org.s3-website-us-east-1.amazonaws.com/},
-    note={The Snort Project vol. 2.9.8.2},
-    month=nov,
-    year={2016},
-    urldate={2017-03-22},
-    publisher={Cisco}
+@misc{owasp, 
+    title={Top 10 2013-Top 10}, 
+    url={https://www.owasp.org/index.php/Top_10_2013-Top_10}, 
+    journal={OWASP}
 }
 @inproceedings{pcre2007,
     author = {Mitra, Abhishek and Najjar, Walid and Bhuyan, Laxmi},
@@ -153,7 +143,7 @@
     year={2008}
 }
 @inproceedings{gnort2008,
-    title = {Gnort: {{High Performance Network Intrusion Detection Using Graphics Processors}}},
+    title = {{{Gnort:}} {{High Performance Network Intrusion Detection Using Graphics Processors}}},
     shorttitle = {Gnort},
     doi = {10.1007/978-3-540-87403-4_7},
     abstract = {The constant increase in link speeds and number of threats poses challenges to network intrusion detection systems (NIDS), which must cope with higher traffic throughput and perform even more complex per-packet processing. In this paper, we present an intrusion detection system based on the Snort open-source NIDS that exploits the underutilized computational power of modern graphics cards to offload the costly pattern matching operations from the CPU, and thus increase the overall processing throughput. Our prototype system, called Gnort, achieved a maximum traffic processing throughput of 2.3 Gbit/s using synthetic network traces, while when monitoring real traffic using a commodity Ethernet interface, it outperformed unmodified Snort by a factor of two. The results suggest that modern graphics cards can be used effectively to speed up intrusion detection systems, as well as other systems that involve pattern matching operations.},
@@ -367,14 +357,6 @@
     url={http://docs.nvidia.com/cuda/pdf/CUDA_C_Programming_Guide.pdf},
     urldate = {2017-03-22},
 }
-@misc{snortfaq,
-    title={Snort Frequently Asked Questions},
-    url={https://www.snort.org/faq.html},
-    note={The Snort Project vol. 2.9.8.2},
-    year={2016},
-    urldate={2017-03-22},
-    publisher={Cisco}
-}
 @inproceedings{5358130, 
     author={E. Azimi and M. B. Ghaznavi-Ghoushchi and A. M. Rahmani}, 
     booktitle={2009 IEEE International Conference on Intelligent Computing and Intelligent Systems}, 
@@ -430,4 +412,29 @@
     year = {2009},
     pages = {175--184},
     file = {smith2009.pdf:/media/Fikri/TA/storage/32SPVXII/smith2009.pdf:application/pdf}
+}
+@article{amdahl, 
+    title={Validity of the Single Processor Approach to Achieving Large Scale Computing Capabilities}, 
+    DOI={10.1145/1465482.1465560}, 
+    journal={Proceedings of the April 18-20, 1967, spring joint computer conference on - AFIPS 67 (Spring)}, 
+    author={Amdahl, Gene M.}, 
+    year={1967}
+}
+@article{gustafson, 
+    title={Reevaluating Amdahl's Law}, 
+    volume={31}, 
+    DOI={10.1145/42411.42415}, 
+    number={5}, 
+    journal={Communications of the ACM}, 
+    author={Gustafson, John L.}, 
+    year={1988}, 
+    month={Jan}, 
+    pages={532–533}
+}
+@book{os,
+    place={Hoboken, NJ}, 
+    title={Operating system concepts}, 
+    publisher={Wiley}, 
+    author={Silberschatz, Abraham and Galvin, Peter B. and Gagne, Greg}, 
+    year={2018}
 }
