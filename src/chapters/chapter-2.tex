@@ -73,7 +73,7 @@
 
   \subsection{Modus Snort NIDPS}
 
-    Snort memiliki 3 buah modus, modus pengendus, modus pencatat, dan modus deteksi intrusi. Modus pengendus hanya menampilkan informasi tentang \emph{header} paket. Perintah yang berbeda dapat digunakan menampilkan \emph{header} untuk protokol berbeda. Modus pencatat hanya mencatat paket ke disk. Modus ini dapat digunakan untuk menggolongkan payload berdasarkan protokol dalam direktori yang berbeda. Dan terakhir, modus deteksi intrusi akan melakukan deteksi intrusi dari paket yang disimpan maupun analisis lalu lintas jaringan secara realtime. Modus ini dikonfigurasi menggunakan sebuah file konfigurasi. Melalui modus ini, Snort juga dapat dikonfigurasi agar menjadi sistem pencegah intrusi (NIPS) untuk menghalangi jaringan dengan membuat sebuah \emph{bridge}.
+    Snort memiliki 3 buah modus, modus pengendus, modus pencatat, dan modus deteksi intrusi. Modus pengendus hanya menampilkan informasi tentang \emph{header} paket. Perintah yang berbeda dapat digunakan menampilkan \emph{header} untuk protokol berbeda. Modus pencatat hanya mencatat paket ke dalam berkas. Modus ini dapat digunakan untuk menggolongkan payload berdasarkan protokol dalam direktori yang berbeda. Dan terakhir, modus deteksi intrusi akan melakukan deteksi intrusi dari paket yang disimpan maupun analisis lalu lintas jaringan secara realtime. Modus ini dikonfigurasi menggunakan sebuah file konfigurasi. Melalui modus ini, Snort juga dapat dikonfigurasi agar menjadi sistem pencegah intrusi (NIPS) untuk menghalangi jaringan dengan membuat sebuah \emph{bridge}.
 
   \subsection{Implementasi Snort NIDPS}
 
@@ -101,89 +101,93 @@
       \item \emph{reference}, acuan \emph{vulnerability} yang diduga
     \end{enumerate} 
 
-\section{Komputasi Paralel}
+% \section{Komputasi Paralel}
 
-  \blindtext
+%   % \blindtext
 
-  \subsection{Hukum Amdahl dan Hukum Gustafson}
+%   \subsection{Hukum Amdahl dan Hukum Gustafson}
 
-    Secara optimal, speedup yang dicapai dengan paralelisasi akan tumbuh secara linier. Namun kenyataannya, paralesisasi terbatas dengan porsi sistem yang dapat diparalelkan. Sehingga, speedup maksimum yang akan dicapai hanya akan sebesar konstanta tertentu \citep{amdahl}. Hipotesis ini dikenal dengan Hukum Amdahl dengan persamaan
+%     Secara optimal, speedup yang dicapai dengan paralelisasi akan tumbuh secara linier. Namun kenyataannya, paralesisasi terbatas dengan porsi sistem yang dapat diparalelkan. Sehingga, speedup maksimum yang akan dicapai hanya akan sebesar konstanta tertentu \citep{amdahl}. Hipotesis ini dikenal dengan Hukum Amdahl dengan persamaan
 
-    \begin{equation}
-      S_{latensi}(s) = \frac{1}{1 - p + \frac{p}{s}}
-    \end{equation} \\
-    dengan $Q$ adalah jumlah simpul dan $P$ adalah jumlah pola.
+%     \begin{equation}
+%       S_{latensi}(s) = \frac{1}{1 - p + \frac{p}{s}}
+%     \end{equation} \\
+%     dengan $Q$ adalah jumlah simpul dan $P$ adalah jumlah pola.
 
-    Hukum Amdahl hanya berlaku pada kasus dengan ukuran masalah yang tetap. Pada prakteknya, semakin besar kapasitas komputasi, ukuran masalah yang dipecahkan juga semakin besar dengan jumlah data yang juga besar, sehingga waktu yang dihabiskan pada porsi sistem yang dapat diparalelkan juga makin besar \citep{gustafson}. Berdasarkan fakta tersebut, Gustafson mengajukan perbaikan pada Hukum Amdahl
+%     Hukum Amdahl hanya berlaku pada kasus dengan ukuran masalah yang tetap. Pada prakteknya, semakin besar kapasitas komputasi, ukuran masalah yang dipecahkan juga semakin besar dengan jumlah data yang juga besar, sehingga waktu yang dihabiskan pada porsi sistem yang dapat diparalelkan juga makin besar \citep{gustafson}. Berdasarkan fakta tersebut, Gustafson mengajukan perbaikan pada Hukum Amdahl
 
-    \begin{equation}
-      S_{latensi}(s) = 1 - p + sp
-    \end{equation} \\
+%     \begin{equation}
+%       S_{latensi}(s) = 1 - p + sp
+%     \end{equation} \\
 
-    Terlihat bahwa Hukum Gustafson membuat speedup maksimum menjadi lebih linier dan realistis.
+%     Terlihat bahwa Hukum Gustafson membuat speedup maksimum menjadi lebih linier dan realistis.
 
-  \subsection{\emph{Multiprocessing} dan \emph{Multithreading}}
+%   \subsection{\emph{Multiprocessing} dan \emph{Multithreading}}
 
-    Proses adalah program yang sedang dieksekusi. Ketika proses dijalankan, dia memiliki beberapa status: baru, berjalan, menunggu, siap, dan berhenti. Tiap proses memiliki informasi mengenai alokasi memori, status proses, dan isi CPU register yang disebut dengan konteks \citep{os}. Ketika proses ini pertama dilanjutkan dari keadaan menunggu, maka CPU akan memuat konteks proses. Jika ada, proses lain yang akan berjalan, maka CPU akan mengganti konteks proses dengan konteks proses baru yang akan berjalan. Hal ini dikenal dengan \emph{context switching}.
+%     Proses adalah program yang sedang dieksekusi. Ketika proses dijalankan, dia memiliki beberapa status: baru, berjalan, menunggu, siap, dan berhenti. Tiap proses memiliki informasi mengenai alokasi memori, status proses, dan isi CPU register yang disebut dengan konteks \citep{os}. Ketika proses ini pertama dilanjutkan dari keadaan menunggu, maka CPU akan memuat konteks proses. Jika ada, proses lain yang akan berjalan, maka CPU akan mengganti konteks proses dengan konteks proses baru yang akan berjalan. Hal ini dikenal dengan \emph{context switching}.
 
-    Satu proses dapat memiliki banyak thread. Thread didefinisikan sebagai unit terkecil eksekusi dari CPU \citep{os}. Thread dikenal pula dengan proses ringan. Berbeda dengan proses, thread pada proses yang sama dapat berbagi memori yang sama. Penggunaan thread dapat memungkinkan operasi yang IO-bound dan CPU-bound dapat berjalan bersamaan.
+%     Satu proses dapat memiliki banyak thread. Thread didefinisikan sebagai unit terkecil eksekusi dari CPU \citep{os}. Thread dikenal pula dengan proses ringan. Berbeda dengan proses, thread pada proses yang sama dapat berbagi memori yang sama. Penggunaan thread dapat memungkinkan operasi yang IO-bound dan CPU-bound dapat berjalan bersamaan.
 
-    Multiprocessing yaitu teknik untuk menggunakan proses yang berbeda untuk melakukan suatu pekerjaan. Sedangkan multithreading yaitu teknik yang memungkinkan satu unit pemroses (seperti CPU dan GPU) untuk mengeksekusi banyak thread secara konkuren. Keuntungan multithreading dibandingkan multiprocess adalah masing-masing thread akan berbagi resource dari unit komputasi, seperti memori, cache dan translation lookaside buffer (TLB). Selain itu, komunikasi antar thread juga bisa dilakukan dengan menggunakan memori bersama. 
+%     Multiprocessing yaitu teknik untuk menggunakan proses yang berbeda untuk melakukan suatu pekerjaan. Sedangkan multithreading yaitu teknik yang memungkinkan satu unit pemroses (seperti CPU dan GPU) untuk mengeksekusi banyak thread secara konkuren. Keuntungan multithreading dibandingkan multiprocess adalah masing-masing thread akan berbagi resource dari unit komputasi, seperti memori, cache dan translation lookaside buffer (TLB). Selain itu, komunikasi antar thread juga bisa dilakukan dengan menggunakan memori bersama. 
 
-  \subsection{Sinkronisasi}
+%   \subsection{Sinkronisasi}
 
-    Multithreading memungkinkan kita untuk saling berbagi memori yang sama. Namun, ada kerugian dari adanya sharing resource ini. Task antar thread harus menjamin bahwa mereka tidak mengakses dan menimpa memori yang sama atau mereka akan mengakibatkan nilai memori menjadi tidak konsisten. Masalah ini dikenal dengan \emph{race condition}. Race condition terjadi ketika dua atau lebih thread memasuki wilayah yang seharusnya hanya boleh dimasuki satu thread yang disebut \emph{critical section}. 
+%     Multithreading memungkinkan kita untuk saling berbagi memori yang sama. Namun, ada kerugian dari adanya sharing resource ini. Task antar thread harus menjamin bahwa mereka tidak mengakses dan menimpa memori yang sama atau mereka akan mengakibatkan nilai memori menjadi tidak konsisten. Masalah ini dikenal dengan \emph{race condition}. Race condition terjadi ketika dua atau lebih thread memasuki wilayah yang seharusnya hanya boleh dimasuki satu thread yang disebut \emph{critical section}. 
 
-    Untuk menghindari terjadinya race condition kita dapat melakukan sinkronisasi proses. Ada beberapa metode sinkronisasi proses yang akan digunakan pada penelitian ini:
+%     Untuk menghindari terjadinya race condition kita dapat melakukan sinkronisasi proses. Ada beberapa metode sinkronisasi proses yang akan digunakan pada penelitian ini:
 
-    \begin{enumerate}
+%     \begin{enumerate}
 
-    \item
-    Mutex lock \\
-    Mutex 
+%     \item
+%     Mutex lock \\
+%     Mutex 
 
-    \item
-    Semaphore \\
+%     \item
+%     Semaphore \\
 
-    \item
-    Barrier \\
+%     \item
+%     Barrier \\
 
-    \end{enumerate}
+%     \end{enumerate}
 
- Ketika beberapa thread akan menggunakan critical section, maka flag akan dipasang untuk mencegah thread lain masuk dalam critical section tersebut. Ketika thread tersebut telah keluar dari critical section, flag akan dicabut kembali dan thread lain akan dapat masuk ke dalam critical section. 
+%  Ketika beberapa thread akan menggunakan critical section, maka flag akan dipasang untuk mencegah thread lain masuk dalam critical section tersebut. Ketika thread tersebut telah keluar dari critical section, flag akan dicabut kembali dan thread lain akan dapat masuk ke dalam critical section. 
 
-    Ada banyak jenis implementasi dari flag yang 
+%     Ada banyak jenis implementasi dari flag yang 
 %Hal ini bisa diatasi dengan memasang lock pada resoure yang mungkin akan diakses bersama-sama. Lock dapat memandaatkan mutex lock, semaphore, atau dll.
 
-\section{Struktur Data Trie}
+% \section{Struktur Data Trie}
 
-  Struktur data \emph{trie} adalah struktur data yang digunakan untuk menyimpan himpunan dinamis dari beberapa string \citep{trie59}. Struktur data trie merupakan jenis dari struktur pohon yang memiliki jumlah simpul anak yang tidak tentu. 
+  %Struktur data \emph{trie} adalah struktur data yang digunakan untuk menyimpan himpunan dinamis dari beberapa string \citep{trie59}. Struktur data trie merupakan jenis dari struktur pohon yang memiliki jumlah simpul anak yang tidak tentu. 
   % Secara umum, \emph{trie} dapat menggambarkan dengan .  % 
-  Simpul akar \emph{trie} akan dimulai dari simpul kosong. Lalu bercabang ketika ada karakter yang berbeda. Sehingga pencarian string dalam kamus dapat dilakukan dengan menelusuri tiap simpul pada \emph{trie}. Trie dapat dimodelkan sebagai sebuah finite automata. Tiap simpul dapat dimodelkan sebagai status dan huruf atau substring dimodelkan sebagai fungsi transisi. Lalu, setiap simpul awal dan simpul akhir akan ditandai secara khusus. Ketika simpul akhir tercapai, berarti salah satu pola ditemukan.
+  %Simpul akar \emph{trie} akan dimulai dari simpul kosong. Lalu bercabang ketika ada karakter yang berbeda. Sehingga pencarian string dalam kamus dapat dilakukan dengan menelusuri tiap simpul pada \emph{trie}. Trie dapat dimodelkan sebagai sebuah finite automata. Tiap simpul dapat dimodelkan sebagai status dan huruf atau substring dimodelkan sebagai fungsi transisi. Lalu, setiap simpul awal dan simpul akhir akan ditandai secara khusus. Ketika simpul akhir tercapai, berarti salah satu pola ditemukan.
 
-  \begin{figure}[htb]
-      \centering
-      \includegraphics[width=0.8\textwidth]{resources/trie.png}
-      \caption[Contoh trie untuk kata "A","to", "tea", "ted", "ten", "i", "in", dan "inn"]{Contoh trie untuk kata "A","to", "tea", "ted", "ten", "i", "in", dan "inn"}
-    \end{figure}
+  %\begin{figure}[htb]
+  %    \centering
+  %    \includegraphics[width=0.8\textwidth]{resources/trie.png}
+  %    \caption[Contoh trie untuk kata "A","to", "tea", "ted", "ten", "i", "in", dan "inn"]{Contoh trie untuk kata "A","to", "tea", "ted", "ten", "i", "in", dan "inn"}
+  %  \end{figure}
 
-  Strategi implementasi yang biasa dilakukan yaitu dengan menggunakan list untuk menyimpan simpul anak sebanyak jumlah karakter maksimal pada tiap simpul. Bisa juga menggunakan tabel statik untuk menyimpan referensi ke simpul anak. 
+  %Strategi implementasi yang biasa dilakukan yaitu dengan menggunakan list untuk menyimpan simpul anak sebanyak jumlah karakter maksimal pada tiap simpul. Bisa juga menggunakan tabel statik untuk menyimpan referensi ke simpul anak. 
 
-  \subsection{Bitwise Trie}
+  %\subsection{Bitwise Trie}
 
-    Bitwise Trie adalah varian trie yang menggunakan operasi bit untuk penelusuran simpul. Berbeda dari trie yang menggunakan karakter sebagai fungsi transisi, bitwise trie hanya memiliki dua simpul anak tiap simpulnya. Meski terlihat lambat, metode ini mengoptimalkan cache lokal
+  %  Bitwise Trie adalah varian trie yang menggunakan operasi bit untuk penelusuran simpul. Berbeda dari trie yang menggunakan karakter sebagai fungsi transisi, bitwise trie hanya memiliki dua simpul anak tiap simpulnya. Meski terlihat lambat, metode ini mengoptimalkan cache lokal
 
-  \subsection{Trie dengan Kompresi}
+  %\subsection{Trie dengan Kompresi}
 
 \section{\emph{Pattern Matching}}
 
-  \emph{Pattern matching} adalah metode mencari kemunculan sebuah string atau substring terhadap string lain. \emph{Pattern matching} menjadi salah satu komponen yang berpengaruh dalam kinerja NIDPS. . Ada dua jenis utama pencocokan pola, yaitu \emph{single pattern matching} dan \emph{multi-pattern matching}. Fokus bahasan tugas akhir ini adalah \emph{multi-pattern matching}.
+  \emph{Pattern matching} adalah metode mencari kemunculan sebuah string atau substring terhadap string lain. \emph{Pattern matching} menjadi salah satu komponen inti dalam NIDPS. Secara umum ada dua jenis utama pencocokan pola, yaitu \emph{single pattern matching} dan \emph{multi-pattern matching}. 
+  
+  \emph{Single pattern matching} yaitu pencocokan masukan terhadap satu pola. Algoritma yang tergolong \emph{single pattern matching} yaitu algoritma Knuth-Morris-Pratt dan Boyer-Moore. Sementara itu, \emph{multi-pattern matching} mencocokkan masukan terhadap beberapa pola sekaligus. Algoritma yang termasuk dalam \emph{multi-pattern matching} yaitu algoritma Aho-Corasick dan Wu-Manber, yang merupakan modifikasi dari algoritma Boyer-Moore. Fokus bahasan tugas akhir ini adalah \emph{multi-pattern matching}.
 
   \subsection{Algoritma Aho-Corasick}
 
-    Algoritma Aho-Corasick adalah algoritma \emph{multi-pattern matching} yang dapat mencari kemunculan string dalam sebuah kamus \citep{ahoc1975}. Pencarian juga bisa dilakukan pada substring terhadap semua string dalam kamus. Dengan memodelkan pola paket menjadi string atau regular expression, dapat dicari kemunculan pola serangan menggunakan algoritma Aho-Corasick ini.
+    Algoritma Aho-Corasick adalah algoritma \emph{multi-pattern matching} yang dapat mencari kemunculan string dalam sebuah kamus \citep{ahoc1975}. Algoritma ini dapat mencari kemunculan setiap string dalam kamus dalam sekali pencocokan. Komponen utama dalam algoritma ini yaitu kamus yang berupa \emph{finite automata}. %dan \emph{failure transition}.
 
-    Kamus berisi semua string \emph{rule} yang akan dicocokkan. Pembangkitan kamus hanya dilakukan sekali sebelum pencocokan string dilakukan. Ada beberapa desain kamus yang dapat digunakan. Salah satu bentuk yang umum yaitu \emph{finite automata} atau FSM (\emph{finite state machine}) yang menyerupai \emph{trie}. Pembangkitan kamus dapat dilakukan dalam $O(kp)$, dengan $k$ adalah jumlah string pada kamus dan $p$ adalah panjang maksimum string pada kamus.
+    Kamus berisi kumpulan string \emph{rule} yang akan dicocokkan. Penyusunan kamus hanya perlu dilakukan sekali sebelum pencocokan string dilakukan. Penyusunan kamus dilakukan dalam $O(kp)$, dengan $k$ adalah jumlah string pada kamus dan $p$ adalah panjang maksimum string pada kamus.
+
+    Dalam kamus ada pula \emph{failure transition}. \emph{Failure transition} akan menunjuk ke posisi terakhir prefiks yang cocok dengan suffiks string yang dicari. Sehingga ketika pencarian tidak cocok pada suatu string, akan dilanjutkan pada string berikutnya yang prefiksnya cocok dengan suffiks string sebelumnya. Dengan \emph{failure transition}, pencocokan banyak pola dapat lebih efisien dibandingkan harus mengulang tiap pencarian dari awal. Kompleksitas pencarian algoritma ini yaitu $O(x)$, dengan $x$ adalah panjang string pola.
 
     \begin{figure}[htb]
       \centering
@@ -191,11 +195,9 @@
       \caption[\emph{Finite automata} kamus algoritma Aho-Corasick dengan \emph{failure transition}]{\emph{Finite automata} kamus algoritma Aho-Corasick dengan \emph{failure transition} \citep{lin2013}}
     \end{figure}
 
-    Desain yang lebih hemat memori dengan menggunakan \emph{failure transition}. \emph{Failure transition} akan menunjuk ke posisi terakhir prefiks yang cocok dengan suffiks string yang dicari. Sehingga ketika pencarian tidak cocok pada suatu string, akan dilanjutkan pada string berikutnya yang prefiksnya cocok dengan suffiks string sebelumnya. Menggunakan \emph{failure transition}, pencocokan banyak pola dapat lebih efisien ketimbang harus mengulang tiap pencarian dari awal. Sehingga pencarian dapat dilakukan dalam $O(x)$, dengan $x$ adalah panjang string pola.
-
   \subsection {\emph{Boundary Detection Problem}}
 
-  Untuk dapat meningkatkan kinerja algoritma Aho-Corasick, kamus dapat dipartisi menjadi beberapa segmen untuk tiap pola. Sehingga tiap partisi dapat digunakan untuk pencocokan pada tiap \emph{thread}. Namun terdapat ada masalah pada pencocokan partisi ketika pola yang dicari ternyata berada pada lebih dari satu partisi dan terpotong. Masalah ini dikenal sebagai \emph{boundary detection problem}. 
+    Untuk dapat meningkatkan kinerja algoritma Aho-Corasick, kamus dapat dipartisi menjadi beberapa segmen untuk tiap pola. Sehingga tiap partisi dapat digunakan untuk pencocokan pada tiap \emph{thread}. Namun terdapat ada masalah pada pencocokan partisi ketika pola yang dicari ternyata berada pada lebih dari satu partisi dan terpotong. Masalah ini dikenal sebagai \emph{boundary detection problem}. 
 
     \begin{figure}[htb]
       \centering
@@ -203,11 +205,11 @@
       \caption[\emph{Boundary detection problem} terjadi pada pola "AB" tidak terbaca oleh \emph{thread} 3 dan 4]{\emph{Boundary detection problem} terjadi pada pola "AB" tidak terbaca oleh \emph{thread} 3 dan 4 \citep{lin2013}}
     \end{figure}
 
-  Solusi dari masalah itu yaitu dengan menambah jangkauan pencocokan sepanjang $m - 1$, yaitu panjang pola terpanjang dikurangi satu. Total kompleksitas yang diperoleh tiap thread menjadi $O(n/s + m)$ dengan $n$ adalah panjang masukan dan $s$ adalah banyak segmen yang dibentuk. Sehingga total kompleksitas untuk lookup memori menjadi $O((n/s + m) * s) = O(n + ms)$. Dibandingkan dengan lookup pada Aho-Corasick standar yang hanya $(O(n)$, operasi ini bisa jadi akan menjadi bottleneck pada pencarian pola.
+    Solusi dari masalah itu yaitu dengan menambah jangkauan pencocokan sepanjang $m - 1$, yaitu panjang pola terpanjang dikurangi satu. Total kompleksitas yang diperoleh tiap thread menjadi $O(n/s + m)$ dengan $n$ adalah panjang masukan dan $s$ adalah banyak segmen yang dibentuk. Sehingga total kompleksitas untuk lookup memori menjadi $O((n/s + m) * s) = O(n + ms)$. Dibandingkan dengan lookup pada Aho-Corasick standar yang hanya $(O(n)$, operasi ini bisa jadi akan menjadi bottleneck pada pencarian pola.
 
   \subsection {\emph{Parallel Failureless Aho-Corasick}}
 
-    Maka, dikembangkan sebuah modifikasi algoritma Aho-Corasick yang mampu melakukan partisi dan pencocokan tanpa mengalami masalah seperti di atas yang disebut \emph{Parallel Failureless Aho-Corasick} (PFAC). PFAC menggunakan \emph{state machine} yang tidak mengandung \emph{failure transition} dan masing-masing \emph{thread} hanya mencocokkan satu string pola \citep{lin2013}. Menggunakan desain ini, PFAC lebih hemat memori karena tidak menggunakan \emph{failure transition}. Selain itu, umur \emph{thread} juga lebih singkat sehingga \emph{throughput} yang dihasilkan lebih besar.
+    Algoritma \emph{Parallel Failureless Aho-Corasick} (PFAC) merupakan pengembangan dari algoritma Aho-Corasick untuk melakukan pencocokan dengan \emph{multithreading}. PFAC menggunakan \emph{state machine} yang tidak mengandung \emph{failure transition} dan masing-masing \emph{thread} memulai pencocokan dari tiap satu karakter masukan \citep{lin2013}.
 
     \begin{figure}[htb]
       \centering
@@ -217,7 +219,7 @@
 
 \section{\emph{General-Purpose computing on Graphics Processing Units}}
 
-  \emph{General-purpose computing on graphics processing units} (GPGPU, kadang disebut juga GPGP atau GP\textsuperscript{2}U) adalah teknik untuk menggunakan pemroses grafis / GPU untuk melakukan komputasi umum yang biasa dilakukan pada pemroses CPU. GPU memiliki banyak core yang berjalan paralel. Desain GPU berbeda dari CPU karena fokus GPU adalah melakukan operasi secara paralel. Berbeda dari CPU yang digunakan untuk melakukan operasi sekuensial \citep{lindholm2001}. Dalam GPU terdapat beberapa \emph{stream processor} yang masing-masing memiliki beberapa \emph{core thread}.
+  \emph{General-purpose computing on graphics processing units} (GPGPU, kadang disebut juga GPGP atau GP\textsuperscript{2}U) adalah teknik untuk menggunakan pemroses grafis / GPU untuk melakukan komputasi umum yang biasa dilakukan pada pemroses CPU. GPU memiliki banyak core yang berjalan paralel. Desain GPU berbeda dari CPU karena fokus GPU adalah melakukan operasi secara paralel. Berbeda dari CPU yang digunakan untuk melakukan operasi sekuensial \citep{lindholm2001}. Dalam GPU terdapat beberapa \emph{stream multiprocessor} (SM) yang masing-masing memiliki beberapa \emph{core thread} atau \emph{stream processor} (SP).
 
   \begin{figure}[htb]
     \centering
@@ -225,35 +227,53 @@
     \caption[Perbedaan arsitektur CPU dan GPU]{Perbedaan arsitektur CPU dan GPU \citep{cuda}}
   \end{figure}
 
+  \subsection{Struktur Memori}
+    
+    Tiap \emph{core thread} memiliki memori lokal yang saling independen. Dalam tiap blok, \emph{thread} yang ada dalam blok dapat mengakses \emph{shared memory}. Kemudian ada memori global yang dapat diakses semua \emph{thread}. 
+    
+    Ada perbedaan kecepatan ketika melakukan operasi pada tiap tingkatan memori. Makin tinggi tingkatan memori, makin besar latensi akses memori. Urutan besar latensi akses memori yaitu memori lokal, memori bersama, kemudian memori global. Sehingga memori global tidak cocok digunakan untuk operasi yang tidak memerlukan sinkronisasi antar \emph{thread}. 
+    
+    Selain ketiga memori tersebut, ada juga memori yang hanya dapat ditulis oleh \emph{host} yaitu memori konstanta dan tekstur. Kedua memori ini hanya dapat ditulis sekali sebelum \emph{kernel} dipanggil. Keuntungan menggunakan kedua memori ini yaitu latensi akses yang lebih kecil dari memori global. Hal ini terjadi karena kedua memori ini memanfaatkan \emph{locality} dalam akses memori. Memori konstanta menggunakan \emph{cache} sehingga akses untuk memori yang sama berkali-kali akan sangat cepat. Sedangkan memory tekstur menggunakan \emph{spatial locality} untuk \emph{thread} yang berdekatan secara dua dimensi.
+
+    \begin{figure}[htb]
+      \centering
+      \includegraphics[width=0.8\textwidth]{resources/cudamem.png}
+      \caption[Tingkatan memori GPU]{Tingkatan memori GPU \citep{cuda}}
+    \end{figure}
+
+  % Saat ini ada dua platform GPGPU yang populer, CUDA dan OpenCL. CUDA adalah platform yang dikembangkan oleh NVIDIA. CUDA hanya dapat berjalan pada perangkat milik NVIDIA. Sedangkan OpenCL dikembangkan oleh grup konsorsium Khronos. OpenCL dapat berjalan pada banyak perangkat, seperti CPU, GPU, FPGA, dan DSP (\emph{digital signal processor})).
+  
   %Penelitian tentang GPGPU dimulai ketika \emph{programmable pixel} dan \emph{vertex shaders} diperkenalkan. Penggunaan GPGPU lebih mudah dengan adanya \emph{shading language} yang berjalan pada GPU. \emph{Shading language} adalah bahasa pemrograman yang spesifik untuk mendeskripsikan tampilan sebuah \emph{scene} \citep{proudfoot2001}. \emph{Shading language} bertujuan menyediakan antarmuka \emph{high level} untuk operasi \emph{vertex} pada GPU. 
-
+  
   %Dengan adanya \emph{shading language}, operasi vektor dan matriks dapat dengan mudah diubah menjadi operasi \emph{vertex}. Sejak saat itu, usaha untuk melakukan komputasi umum dengan GPU mulai bermunculan seperti perkalian matriks \citep{matrix2001}, simulasi fisika \citep{phys2002}, hingga dekomposisi LU pada matriks persegi \citep{lugpu2005}. Maka, pada tahun 2003, dalam disertasinya \citep{harris2003}, Mark Harris mengajukan sebuah istilah yang kini dikenal sebagai \emph{general-purpose computing on graphics processing units} (GPGPU) sekaligus mendirikan situs GPGPU.org.
-
-  Saat ini ada dua platform GPGPU yang populer, CUDA dan OpenCL. CUDA adalah platform yang dikembangkan oleh NVIDIA. CUDA hanya dapat berjalan pada perangkat milik NVIDIA. Sedangkan OpenCL dikembangkan oleh grup konsorsium Khronos. OpenCL dapat berjalan pada banyak perangkat, seperti CPU, GPU, FPGA, dan DSP (\emph{digital signal processor})).
-
+  
   \subsection{\emph{Compute Unified Device Architecture}}
-
+  
     \emph{Compute Unified Device Architecture} (CUDA) adalah platform dan API untuk GPGPU oleh NVIDIA. CUDA menyediakan antarmuka untuk dapat menggunakan GPU NVIDIA untuk melakukan GPGPU \citep{cuda}. CUDA API dapat diimplementasi menggunakan bahasa C, C++, dan Fortran. Selain itu, ada juga \emph{binding} yang dibuat dalam pustaka beberapa bahasa oleh pihak ketiga, seperti Python, Perl, Java, Ruby, Haskell, Lua, MATLAB, dan Mathematica.
-
+    
     \subsubsection{Struktur Kode CUDA}
-
+    
       Terdapat dua perangkat yang berbeda untuk \emph{runtime} CUDA, yaitu \emph{host} (CPU), dan \emph{device} (GPU). Masing-masing platform akan menjalankan bagian kode tersendiri. Ada dua bagian dalam kode program CUDA, yaitu \emph{host code} dan \emph{kernel code}. Ketika program berjalan, maka \emph{host code} akan berjalan terlebih dahulu. Lalu, \emph{kernel code} akan disalin dan dijalankan di memori GPU. Karena memori yang dapat diakses oleh masing-masing kode juga terpisah, maka perlu dilakukan alokasi pada memori \emph{device} dan transfer antar memori \emph{device} dan memori \emph{host}.
-
+    
     \subsubsection{\emph{CUDA Thread}}
-
+    
       CUDA \emph{thread} dibagi menjadi beberapa kelompok blok yang disebut \emph{grid}. Masing-masing \emph{grid} berisi beberapa buah blok. Di dalam blok terdapat beberapa \emph{thread} yang akan berjalan terpisah. 
-
+      
       \begin{figure}[htb]
         \centering
         \includegraphics[width=0.8\textwidth]{resources/cudathread.jpg}
         \caption[Organisasi \emph{thread} CUDA]{Organisasi \emph{thread} CUDA \citep{cuda}}
       \end{figure}
-
+      
       CUDA \emph{thread} memiliki indeks, yang berdimensi 3. Indeks \emph{thread} akan menunjukkan nomor blok dan nomor \emph{thread} tersebut dalam blok. Menggunakan kedua indeks tersebut, dapat dibentuk nomor yang unik tiap \emph{thread}. Nomor unik tersebut dapat digunakan untuk melakukan pemrosesan paralel pada data besar. Hingga CUDA versi 8.0, maksimum dimensi blok \emph{thread}, dimensi grid, dan jumlah \emph{thread} tiap blok berturut-turut adalah 1024 x 1024 x 64, 65535 x 65535 x 65535, dan 1024.
 
-    \subsubsection{Struktur Memori}
+    \subsubsection{\emph{Warp} dan Percabangan}
 
-      Tiap \emph{thread} CUDA memiliki memori lokal yang saling independen. Dalam tiap blok, \emph{thread} yang ada dalam blok dapat mengakses \emph{shared memory}. Kemudian ada memori global yang dapat diakses semua \emph{thread}. Ada perbedaan kecepatan ketika melakukan operasi pada tiap tingkatan memori. Urutan kecepatan akses memori yaitu memori lokal, memori bersama, kemudian memori global. Sehingga tidak disarankan menggunakan memori global untuk operasi yang tidak membutuhkan sinkronisasi antar \emph{thread}. Selain itu, ada juga memori yang hanya dapat ditulis oleh \emph{host} yaitu memori konstanta dan tekstur.
+      \emph{Thread} akan dieksekusi bersama-sama dalam sebuah kumpulan yang disebut \emph{warp}. \emph{Thread} yang berjalan dalam satu \emph{warp} akan mengeksekusi instruksi yang sama dalam satu waktu. Ketika ada percabangan dalam instruksi, maka \emph{warp} tersebut akan berpisah. Ukuran maksimal \emph{warp} saat ini yaitu 32 \emph{thread}.
+
+      Karena percabangan mempengaruhi eksekusi \emph{warp}, maka penempatan kondisi harus dilakukan secara hati-hati. Jika percabangan tidak dilakukan dengan benar dan menyebabkan banyak \emph{thread} terpisah, maka akan banyak \emph{warp} yang akan terbuang karena hanya mengeksekusi sedikit \emph{thread}.
+      
+      Pada GPU arsitektur Fermi, terdapat fitur yang disebut \emph{memory coalescing}. \emph{Memory coalescing} terjadi ketika semua \emph{thread} pada \emph{warp} yang sama mengakses memori yang kontigu. Fitur ini memungkinkan akses memori yang kontigu tersebut dilakukan dalam sekali \emph{request}.
 
 \section{Penelitian Terkait}
 

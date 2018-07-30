@@ -1,13 +1,75 @@
+%!TeX root=../thesis.tex
+
 \chapter{Implementasi dan Pengujian}
 
-\section{Tujuan Pengujian}
-\blindtext
+Pembahasan pada bab ini akan dibagi menjadi dua bagian. Bagian pertama dipaparkan tentang lingkungan dan detail implementasi. Sedangkan bagian kedua dibahas mengenai teknis dan hasil pengujian terhadap perangkat lunak yang sudah dibangun.
 
-\section{Skenario Pengujian}
-\blindtext
+\section{Implementasi}
 
-\section{Hasil Pengujian}
-\blindtext
+  Bagian implementasi dibagi menjadi 4 bagian. Bagian pertama dibahas mengenai lingkungan implementasi. Bagian kedua dibahas mengenai batasan implementasi. Bagian ketiga dibahas mengenai spesifikasi modul. Bagian terakhir berisi konfigurasi sistem deteksi intrusi.
 
-\section{Pembahasan}
-\blindtext
+  \subsection{Lingkungan Implementasi}
+
+    Dalam proses implementasi digunakan sebuah laptop dan sejumlah perangkat lunak untuk menyelesaikan perangkat lunak yang dibangun. Detil spesifikasi perangkat keras dan lunak yang digunakan adalah seperti pada Tabel IV.1.
+    
+    \input{chapters/dev-specs.tex}
+
+  \subsection{Batasan Implementasi}
+
+    Implementasi dilakukan dengan batasan-batasan sebagai berikut.
+
+    \begin{enumerate}
+
+      \item
+      Pencocokan menggunakan satu instance GPU \\
+    
+      \item
+      Pencocokan hanya dilakukan satu kernel code \\
+    
+      \item
+      Masukan paket hanya dilakukan dari berkas PCAP \\
+    
+%    \item
+%    Konfigurasi dilakuakn
+
+    \end{enumerate}
+
+  \subsection{Spesifikasi Modul}
+  
+   \begin{enumerate}
+
+      \item
+      Komponen pembentukan kamus \\
+    
+      \item
+      Komponen pencocokan \\
+    
+      \item
+      Komponen penggabungan hasil \\
+
+    \end{enumerate}
+
+  \subsection{Konfigurasi}
+    \blindtext
+
+\section{Pengujian}
+
+  \subsection{Tujuan Pengujian}
+    Pengujian dilakukan untuk mendapatkan perbandingan kinerja antara modul yand dikembangkan dan modul yang ada dalam NIDS Snort. 
+
+  \subsection{Skenario Pengujian}
+  
+    Pengujian dilakukan dengan membuat dua mesin, satu sebagai 
+    Pengujian dilakukan dengan menerima masukan berupa berkas PCAP. Berkas didapatkan dari log traffic DEFCON ?? yang berlangsung pada ???. Dataset didapatkan dari ???.
+    
+  \subsection{Lingkungan Pengujian}
+    
+    Pengujian dilakukan pada mesin yang sama dengan lingkungan pengembangan.
+    
+    \input{chapters/dev-specs.tex}
+
+  \subsection{Hasil Pengujian}
+    \blindtext
+
+  \subsection{Pembahasan}
+    \blindtext
