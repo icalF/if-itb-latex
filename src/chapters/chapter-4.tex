@@ -10,9 +10,9 @@ Pembahasan pada bab ini akan dibagi menjadi dua bagian. Bagian pertama dipaparka
 
   \subsection{Lingkungan Implementasi}
 
-    Dalam proses implementasi digunakan sebuah laptop dan sejumlah perangkat lunak untuk menyelesaikan perangkat lunak yang dibangun. Detil spesifikasi perangkat keras dan lunak yang digunakan adalah seperti pada Tabel IV.1.
+    Dalam proses implementasi digunakan sebuah komputer dan sejumlah perangkat lunak untuk menyelesaikan perangkat lunak yang dibangun. Detil spesifikasi perangkat keras dan lunak yang digunakan adalah seperti pada Tabel IV.1.
     
-    \input{chapters/dev-specs.tex}
+    \input{tables/dev-specs.tex}
 
   \subsection{Batasan Implementasi}
 
@@ -20,37 +20,54 @@ Pembahasan pada bab ini akan dibagi menjadi dua bagian. Bagian pertama dipaparka
 
     \begin{enumerate}
 
-      \item
-      Pencocokan menggunakan satu instance GPU \\
+      \item Implementasi hanya mengerjakan komponen MPSE (\emph{multipattern search engine}) pada Snort
+
+      \item Pencocokan menggunakan satu \emph{instance} GPU
     
-      \item
-      Pencocokan hanya dilakukan satu kernel code \\
+      \item Pencocokan hanya dilakukan pada satu \emph{thread kernel code}
     
-      \item
-      Masukan paket hanya dilakukan dari berkas PCAP \\
-    
-%    \item
-%    Konfigurasi dilakuakn
+      \item Akuisisi \emph{payload} hanya dilakukan dari berkas PCAP
 
     \end{enumerate}
 
-  \subsection{Spesifikasi Modul}
-  
-   \begin{enumerate}
+  \subsection{Spesifikasi Komponen}
+
+    Implementasi dilakukan dengan membuat beberapa komponen, yaitu:
+
+    \begin{enumerate}
 
       \item
-      Komponen pembentukan kamus \\
-    
-      \item
-      Komponen pencocokan \\
-    
-      \item
-      Komponen penggabungan hasil \\
+      \emph{Handle} \\
+      \emph{Handle} merupakan struktur data yang membungkus fungsionalitas pencocokan untuk dapat digunakan pada \emph{pipeline} Snort. \emph{Handle} berisi fungsi-fungsi yang terkait modul yang dikembangkan seperti menambahkan pola, pembentukan kamus, pencarian, dan mencetak informasi spesifik \emph{handle}. Fungsi-fungsi pada \emph{handle} akan memanggil modul lain yang terkait, misalnya fungsi pembentukan kamus akan memanggil komponen pembentukan kamus pada kode PFAC yang dibuat.
 
+      \item
+      \emph{State machine} \\
+      \emph{State machine} merupakan kamus yang digunakan dalam pencocokan. \emph{State machine} dibentuk di memori \emph{host}. Pola yang telah dikumpulkan dalam \emph{list}, akan disusun ulang sehingga terurut secara alfabetis. Kemudian akan dilakukan penelusuran DFS (\emph{depth-first search}) untuk membangun indeks status.
+
+      \item
+      \emph{Kernel wrapper} \\
+      \emph{Kernel wrapper} adalah \emph{wrapper} yang menyiapkan \emph{payload} sebelum \emph{kernel} dijalankan. \emph{Wrapper} akan menyalin \emph{payload} dari \emph{host buffer} ke \emph{device buffer}. Setelah persiapan selesai, \emph{wrapper} akan memanggil kode \emph{kernel} untuk menjalankan pencocokan.\clearpage
+      
+      \item
+      \emph{Matcher kernel} \\
+      \emph{Kernel} adalah kode GPU yang akan dijalankan untuk pencocokan. \emph{Kernel} hanya akan melakukan \emph{looping} terhadap nomor status berdasarkan tabel transisi yang telah dimuat. \emph{Looping} akan berhenti ketika status telah menuju status akhir maupun status \emph{dummy}.
+
+      \item
+      \emph{Reducer} \\
+      \emph{Reducer} akan menggabungkan hasil pencocokan dari tiap \emph{thread} sehingga diperoleh jumlah total rule yang terdeteksi. \emph{Reducer} dipanggil setelah \emph{matcher} dijalankan. \emph{Reducing} akan dilakukan secara sekuensial pada CPU. Hasil \emph{reducing} akan dikembalikan ke fungsi \emph{search} milik \emph{handle} untuk dikembalikan lagi ke Snort.
+      
     \end{enumerate}
 
   \subsection{Konfigurasi}
-    \blindtext
+
+    Agar Snort dapat dijalankan dengan modul yang telah diintegrasikan, perlu dibuat pengubahan pada konfigurasi. Konfigurasi akan disuplai dari skrip lua. Diantara poin yang perlu diubah pada berkas konfigurasi yaitu:
+
+    \begin{enumerate}
+      \item Pencocokan dilakukan dengan modul PFAC yang telah selesai diintegrasikan.
+      \item Modul \emph{daq (data acquisition)} yang digunakan hanya pcap-daq untuk dapat membaca berkas PCAP.
+      \item \emph{Ruleset} diatur menunjuk ke lokasi \emph{rule} Talos.
+      % \item \emph{Buffer} untuk \emph{payload} diatur sebesar 512.000.000 \emph{byte} atau sebesar 512 MB.
+    \end{enumerate}
 
 \section{Pengujian}
 
@@ -59,17 +76,17 @@ Pembahasan pada bab ini akan dibagi menjadi dua bagian. Bagian pertama dipaparka
 
   \subsection{Skenario Pengujian}
   
-    Pengujian dilakukan dengan membuat dua mesin, satu sebagai 
-    Pengujian dilakukan dengan menerima masukan berupa berkas PCAP. Berkas didapatkan dari log traffic DEFCON ?? yang berlangsung pada ???. Dataset didapatkan dari ???.
+    % Pengujian dilakukan dengan membuat dua mesin, satu sebagai 
+    Pengujian dilakukan dengan menerima masukan berupa berkas PCAP. Berkas didapatkan dari \emph{log traffic} kompetisi DEFCON 25 yang berlangsung pada bulan Juli tahun 2017. Dataset didapatkan dari jaringan \emph{torrent} milik arsip DEFCON.
     
   \subsection{Lingkungan Pengujian}
     
     Pengujian dilakukan pada mesin yang sama dengan lingkungan pengembangan.
     
-    \input{chapters/dev-specs.tex}
+    \input{tables/test-specs.tex}
 
   \subsection{Hasil Pengujian}
-    \blindtext
+    % \blindtext
 
   \subsection{Pembahasan}
-    \blindtext
+    % \blindtext
