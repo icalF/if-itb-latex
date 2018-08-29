@@ -58,16 +58,16 @@ Pembahasan pada bab ini akan dibagi menjadi dua bagian. Bagian pertama dipaparka
       
     \end{enumerate}
 
-  \subsection{Konfigurasi}
+  % \subsection{Konfigurasi}
 
-    Agar Snort dapat dijalankan dengan modul yang telah diintegrasikan, perlu dibuat pengubahan pada konfigurasi. Konfigurasi akan disuplai dari skrip lua. Diantara poin yang perlu diubah pada berkas konfigurasi yaitu:
+  %   Agar Snort dapat dijalankan dengan modul yang telah diintegrasikan, perlu dibuat pengubahan pada konfigurasi. Konfigurasi akan disuplai dari skrip lua. Diantara poin yang perlu diubah pada berkas konfigurasi yaitu:
 
-    \begin{enumerate}
-      \item Pencocokan dilakukan dengan modul PFAC yang telah selesai diintegrasikan.
-      \item Modul \emph{daq (data acquisition)} yang digunakan hanya pcap-daq untuk dapat membaca berkas PCAP.
-      \item \emph{Ruleset} diatur menunjuk ke lokasi \emph{rule} Talos.
-      % \item \emph{Buffer} untuk \emph{payload} diatur sebesar 512.000.000 \emph{byte} atau sebesar 512 MB.
-    \end{enumerate}
+  %   \begin{enumerate}
+  %     \item Pencocokan dilakukan dengan modul PFAC yang telah selesai diintegrasikan.
+  %     \item Modul \emph{daq (data acquisition)} yang digunakan hanya pcap-daq untuk dapat membaca berkas PCAP.
+  %     \item \emph{Ruleset} diatur menunjuk ke lokasi \emph{rule} Talos.
+  %     \item \emph{Buffer} untuk \emph{payload} diatur sebesar 128 kB.
+  %   \end{enumerate}
 
 \section{Pengujian}
 
@@ -76,17 +76,32 @@ Pembahasan pada bab ini akan dibagi menjadi dua bagian. Bagian pertama dipaparka
 
   \subsection{Skenario Pengujian}
   
-    % Pengujian dilakukan dengan membuat dua mesin, satu sebagai 
-    Pengujian dilakukan dengan menerima masukan berupa berkas PCAP. Berkas didapatkan dari \emph{log traffic} kompetisi DEFCON 25 yang berlangsung pada bulan Juli tahun 2017. Dataset didapatkan dari jaringan \emph{torrent} milik arsip DEFCON.
-    
-  \subsection{Lingkungan Pengujian}
-    
-    Pengujian dilakukan pada mesin yang sama dengan lingkungan pengembangan.
-    
-    \input{tables/test-specs.tex}
+  Pengujian dilakukan untuk mengukur peningkatan kinerja deteksi Snort. Skenario yang akan diujikan meliputi strategi-strategi yang dibahas pada Subbab III.2. Berikut ini adalah tipe-tipe skenario yang diuji dalam pengujian ini.
+
+    \begin{enumerate}
+      
+      \item \emph{Baseline} (Aho-Corasick dengan \emph{multithreading} CPU) \\
+      \emph{Baseline} akan menggunakan konfigurasi default Snort. Ini menjadi dasar pengukuran kinerja dan kebenaran program yang diimplementasikan pada GPU.
+
+      \item Skenario 1 (PFAC dengan \emph{global memory}) \\
+      Skenario ini adalah skenario paling dasar. Optimasi hanya dilakukan pada algoritma tanpa melibatkan optimasi pada latensi GPU.
+
+      \item Skenario 2 (PFAC dengan \emph{shared memory}) \\
+      Skenario ini memanfaatkan \emph{shared memory} untuk mengurangi akses ke \emph{global memory}. Transisi \emph{state} awal ke tiap huruf serta \emph{stream} masukan ditampung dalam \emph{shared memory}.
+
+      \item Skenario 3 (PFAC dengan \emph{shared memory} dan \emph{pinned memory}) \\
+      Skenario ini mirip dengan skenario 2 dengan tambahan \emph{pinned memory} pada \emph{buffer}. Mekanisme ini diharapkan dapat mengurangi \emph{swappiness} dan memungkinkan DMA (\emph{direct memory access}).
+
+      \item Skenario 4 (PFAC dengan \emph{shared memory}, \emph{pinned memory}, dan \emph{texture memory}) \\
+      Skenario ini mirip dengan skenario 3 dengan tambahan \emph{texture memory} pada kamus. Dengan \emph{cache} yang lebih besar, penggunaan \emph{texture memory} diharapkan mengurangi transfer memori.
+
+    \end{enumerate}
 
   \subsection{Hasil Pengujian}
-    % \blindtext
 
-  \subsection{Pembahasan}
+    Berikut merupakan hasil pengujian dari seluruh skenario di atas. \emph{Ruleset} yang digunakan yaitu Snort VRT \emph{ruleset} versi 3000. Sedangkan berkas masukan didapatkan dari \emph{log traffic} kompetisi DEFCON 25 yang berlangsung pada bulan Juli tahun 2017. Dataset didapatkan dari jaringan \emph{torrent} milik arsip DEFCON berupa PCAP sebesar 8 GB.
+
+    \input{tables/test-result.tex}
+
+  \subsection{Analisis Hasil Pengujian}
     % \blindtext

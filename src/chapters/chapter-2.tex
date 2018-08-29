@@ -17,7 +17,7 @@
 
   \subsection{Sistem Deteksi dan Pencegahan Intrusi}
 
-    Sistem deteksi dan pencegahan intrusi (\emph{intrusion detection and prevention system} abbr IDPS) adalah mekanisme yang mengotomasi proses deteksi dan pencegahan intrusi kepada satu atau beberapa node. Sistem mengambil paket yang masuk sambil melakukan pengecekan kemudian membuat laporan hasil inspeksi. Laporan hasil inspeksi dapat digunakan untuk menentukan aksi yang akan dilakukan pada paket \citep{nist2007}.
+    Sistem deteksi dan pencegahan intrusi atau \emph{intrusion detection and prevention system} (IDPS) adalah mekanisme yang mengotomasi proses deteksi dan pencegahan intrusi kepada satu atau beberapa node. Sistem mengambil paket yang masuk sambil melakukan pengecekan kemudian membuat laporan hasil inspeksi. Laporan hasil inspeksi dapat digunakan untuk menentukan aksi yang akan dilakukan pada paket \citep{nist2007}.
 
     Ada dua macam NIDPS dilihat dari cakupan deteksinya:
     \begin{enumerate}
@@ -205,11 +205,17 @@
 
     % \footnotetext{\citep{lin2013}}
 
-    Dalam kamus ada yang disebut \emph{failure transition}. \emph{Failure transition} adalah tabel yang berisi posisi terakhir prefiks yang cocok dengan suffiks string yang telah dilewati. Sehingga ketika pencarian tidak cocok pada suatu string, akan dilanjutkan pada string berikutnya yang prefiksnya cocok dengan suffiks string sebelumnya. Tujuan adanya \emph{failure transition} yaitu untuk menghindari pengulangan ketika adanya \emph{mismatch}. Kompleksitas pencarian algoritma ini yaitu $O(x)$, dengan $x$ adalah panjang string pola.
+    Dalam kamus ada yang disebut \emph{failure transition}. \emph{Failure transition} adalah tabel yang berisi posisi terakhir prefiks yang cocok dengan sufiks string yang telah dilewati. Sehingga ketika pencarian tidak cocok pada suatu string, akan dilanjutkan pada string berikutnya yang prefiksnya cocok dengan sufiks string sebelumnya. Tujuan adanya \emph{failure transition} yaitu untuk menghindari pengulangan ketika adanya \emph{mismatch}. Kompleksitas pencarian algoritma ini yaitu $O(x)$, dengan $x$ adalah panjang string pola.
+
+  \subsection {Pembentukan Kamus}
+
+    Kamus dalam Aho-Corasick dibentuk dari kumpulan \emph{string} masukan. Pembentukan kamus dimulai dari \emph{state} awal yang berupa \emph{string} kosong. Kemudian tiap \emph{string} akan ditelusuri per huruf. Tiap huruf akan menjadi transisi ke \emph{state} baru. Ketika penelusuran telah mencapai akhir \emph{string}, maka \emph{state} ditandai sebagai \emph{state} akhir.
+
+    Langkah selanjutnya yaitu membentuk \emph{failure function}. \emph{Failure function} dari tiap \emph{state} adalah prefiks terpanjang pada kamus yang sama dengan sufiks pola. Transisi \emph{failure function} dicari dengan melakukan iterasi pada \emph{previous state}. Tiap \emph{previous state} akan dicek apakah ada \emph{failure function} yang memiliki transisi yang sama dengan \emph{state} yang ingin dibentuk \emph{failure function}-nya. Ketika ada prefiks yang lebih panjang, maka \emph{failure function} akan diperbarui.
     
-    \subsection {\emph{Boundary Detection Problem}}
+  \subsection {\emph{Boundary Detection Problem}}
     
-    Untuk dapat meningkatkan kinerja algoritma Aho-Corasick, kamus dapat dipartisi menjadi beberapa segmen untuk tiap pola. Sehingga tiap partisi dapat digunakan untuk pencocokan pada tiap \emph{thread}. Namun terdapat ada masalah pada pencocokan partisi ketika pola yang dicari ternyata berada pada lebih dari satu partisi dan terpotong seperti pada Gambar II.4 di bawah. Masalah ini dikenal sebagai \emph{boundary detection problem}. 
+    Untuk dapat meningkatkan kinerja algoritma Aho-Corasick, string dapat dipartisi menjadi beberapa segmen. Sehingga tiap partisi dapat dicocokkan menggunakan satu \emph{thread}. Namun terdapat ada masalah pada pencocokan partisi ketika pola yang dicari ternyata berada pada lebih dari satu partisi. Bagian pola akan terpotong seperti pada Gambar II.4 di bawah dan tidak dapat dideteksi. Masalah ini dikenal sebagai \emph{boundary detection problem}. 
     
     \begin{figure}[htb]
       \centering
@@ -231,17 +237,17 @@
       \caption[\emph{Finite automata} Aho-Corasick tanpa \emph{failure transition}]{\emph{Finite automata} Aho-Corasick tanpa \emph{failure transition} \citep{lin2013}}
     \end{figure}
     
-    \section{\emph{General-Purpose computing on Graphics Processing Units}}
-    
-    \emph{General-purpose computing on graphics processing units} (GPGPU, kadang disebut juga GPGP atau GP\textsuperscript{2}U) adalah teknik untuk menggunakan pemroses grafis / GPU untuk melakukan komputasi umum yang biasa dilakukan pada pemroses CPU. Teknik ini memanfaatkan desain GPU berbeda dari CPU yang khusus digunakan untuk memroses grafik dengan unit piksel yang sangat banyak. Sehingga GPU memiliki banyak \emph{core} yang berjalan paralel dan berbeda dari CPU yang biasa digunakan untuk melakukan operasi sekuensial \citep{lindholm2001}. Dalam GPU terdapat beberapa \emph{stream multiprocessor} (SM) yang masing-masing memiliki beberapa \emph{core thread} atau \emph{stream processor} (SP). Ilustrasi perbedaan CPU dan GPU terlihat seperti pada Gambar II.6 berikut.
+\section{\emph{General-Purpose computing on Graphics Processing Units}}
+  
+  \emph{General-purpose computing on graphics processing units} (GPGPU, kadang disebut juga GPGP atau GP\textsuperscript{2}U) adalah teknik untuk menggunakan pemroses grafis / GPU untuk melakukan komputasi umum yang biasa dilakukan pada pemroses CPU. Teknik ini memanfaatkan desain GPU berbeda dari CPU yang khusus digunakan untuk memroses grafik dengan unit piksel yang sangat banyak. Sehingga GPU memiliki banyak \emph{core} yang berjalan paralel dan berbeda dari CPU yang biasa digunakan untuk melakukan operasi sekuensial \citep{lindholm2001}. Dalam GPU terdapat beberapa \emph{stream multiprocessor} (SM) yang masing-masing memiliki beberapa \emph{core thread} atau \emph{stream processor} (SP). Ilustrasi perbedaan CPU dan GPU terlihat seperti pada Gambar II.6 berikut.
 
-    % \footnotetext{\citep{lin2013}}
+  % \footnotetext{\citep{lin2013}}
     
-    \begin{figure}[htb]
-      \centering
-      \includegraphics[width=0.8\textwidth]{resources/GPUvsCPU.png}
-      \caption[Perbedaan arsitektur CPU dan GPU]{Perbedaan arsitektur CPU dan GPU \citep{cuda}}
-    \end{figure}
+  \begin{figure}[htb]
+    \centering
+    \includegraphics[width=0.8\textwidth]{resources/GPUvsCPU.png}
+    \caption[Perbedaan arsitektur CPU dan GPU]{Perbedaan arsitektur CPU dan GPU \citep{cuda}}
+  \end{figure}
     
   % \footnotetext{Cuda}
 
@@ -354,13 +360,21 @@
 
     Pengujian dilakukan dengan konfigurasi CPU ganda Intel X5680 dengan 12 core dan dua GPU NVIDIA GTX 580. Hasil yang didapatkan menggunakan desain ini mampu mencapai 1,5 sampai 4 kali lipat kinerja Snort. \emph{Latency} dapat menurun hingga 13 mikrodetik pada \emph{offloading} paket awal untuk batch sebesar 1,5 kB. Pada pengujian dengan \emph{traffic} jaringan, rancangan ini mampu mencapai \emph{throughput} 25,2 Gbps pada \emph{input} sebesar 40 Gbps.
 
+  \subsection{Optimasi Algoritma Pencocokan Pola pada GPU}
+
+    Salah-satu algoritma yang sering digunakan dalam deteksi pola adalah Aho-Corasick yang bersifat \emph{multi-pattern string matching}. Dalam penelitian yang dilakukan \cite{lin2013}, dilakukan optimasi pada implementasi algoritma Aho-Corasick pada GPU. Implementasi memanfaatkan fitur-fitur pada GPU seperti \emph{memory coalescing}, penghematan transaksi pada \emph{global memory}, dan akses \emph{shared memory} yang bebas \emph{bank-conflict}.
+
+    Desain akan menggunakan pendekatan algoritma AC tanpa \emph{failure function} yaitu PFAC (\emph{Parallel Failureless Aho-Corasick}). Pendekatan ini dapat memaksimalkan penggunaan \emph{thread} pada GPU tanpa menyebabkan \emph{overlapping}. Transaksi ke \emph{global memory} dapat dikurangi dengan memuat transisi \emph{state} kosong ke \emph{shared memory} dan penggunaan \emph{texture memory} yang memanfaatkan \emph{cache}.
+
+    Hasil pengujian dengan CPU Intel Core i7-950 dan GPU NVIDIA GTX 580 menunjukkan peningkatan yang signifikan. Optimasi dengan PFAC pada \emph{multithread} CPU mencapai 7 kali lipat dari AC. Sedangkan PFAC pada GPU dapat mencapai 10 kali lipat daripada AC pada CPU. Masukan didapatkan dari dataset \emph{traffic} kompetisi DEFCON.
+
   \subsection{Penyimpanan \emph{Signature} dengan Struktur \emph{Trie} Terkompresi}
 
     Penyimpanan \emph{signature} untuk NIDS dapat dilakukan dengan struktur \emph{trie} terkompresi. Desain utama \emph{trie} menggunakan representasi penelusuran \emph{breadth first search} (BFS). Lokasi \emph{pointer} simpul anak akan dihitung menggunakan \emph{sparse matrix}. Selain itu dilakukan kompresi terhadap bentuk \emph{trie} sehingga memori yang dibutuhkan lebih padat \citep{bellekens2014}.
 
     \emph{Sparse matrix} adalah matriks yang berisi \emph{offset} dari lokasi simpul anak terkecil dan \emph{bitmap} yang berisi flag dari semua simpul anak dalam 256 karakter ASCII. Ketika ingin melakukan penelusuran, simpul akan melakukan penghitungan karakter berdasarkan offset pertama simpul ditambah dengan kumulatif dari tiap bit. Hasil yang diperoleh adalah indeks dari simpul anak berikutnya.
 
-    Optimasi berikutnya yaitu kompresi pada suffiks kalimat. Kompresi dilakukan dalam dua tahap: penggabungan pada huruf terakhir dan tiga huruf terakhir yang sama. Huruf terakhir dapat digabungkan karena simpul tersebut tidak memiliki anak lagi. Dan tiap simpul tersebut pasti akan menuju ke penanda akhir string. Lalu untuk tahap kedua, akan dihitung suffiks dari pola. Tiap suffiks pada tiga karakter terakhir yang sama akan digabungkan.
+    Optimasi berikutnya yaitu kompresi pada sufiks kalimat. Kompresi dilakukan dalam dua tahap: penggabungan pada huruf terakhir dan tiga huruf terakhir yang sama. Huruf terakhir dapat digabungkan karena simpul tersebut tidak memiliki anak lagi. Dan tiap simpul tersebut pasti akan menuju ke penanda akhir string. Lalu untuk tahap kedua, akan dihitung sufiks dari pola. Tiap sufiks pada tiga karakter terakhir yang sama akan digabungkan.
     
     % Jumlah simpul dapat dihitung ulang dengan persamaan berikut: \\
     % \begin{equation}
@@ -380,4 +394,4 @@
     %     \sum_{i=1}^{r} P\left(g = i \right) \cdot 2i =
     %       \sum_{i=1}^{min\left({r,n} \right)} \frac{\binom{r}{i} \binom{n - i}{i}}{\binom{n}{r}} \cdot 2i
     % \end{equation} \\
-    % dengan $L$ adalah rata-rata panjang \emph{trie} setelah kompresi, $P$ adalah kemungkinan \emph{trie} memiliki suffiks unik sejumlah $i$.
+    % dengan $L$ adalah rata-rata panjang \emph{trie} setelah kompresi, $P$ adalah kemungkinan \emph{trie} memiliki sufiks unik sejumlah $i$.

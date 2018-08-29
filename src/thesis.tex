@@ -44,14 +44,16 @@
 
     \titleformat*{\section}{\centering\bfseries\Large\MakeUpperCase}
     
-    \tableofcontents
     \addcontentsline{toc}{chapter}{DAFTAR ISI} 
+    \tableofcontents
+    
     {%
         \let\oldnumberline\numberline%
         \renewcommand{\numberline}{\figurename~\oldnumberline}%
         \listoffigures%
     }
     \addcontentsline{toc}{chapter}{DAFTAR GAMBAR}  
+    
     {%
         \let\oldnumberline\numberline%
         \renewcommand{\numberline}{\tablename~\oldnumberline}%
@@ -76,7 +78,7 @@
     \input{chapters/chapter-2}
     \input{chapters/chapter-3}
     \input{chapters/chapter-4}
-    % \input{chapters/chapter-5}
+    \input{chapters/chapter-5}
     %----------------------------------------------------------------%
 
     % Daftar pustaka

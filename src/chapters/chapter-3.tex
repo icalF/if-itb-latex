@@ -26,9 +26,21 @@
 
     Pengembangan akan menggunakan platform GPGPU CUDA. Platform CUDA merupakan platform GPGPU yang dibuat pada GPU NVIDIA. Platform CUDA digunakan karena saat ini platform CUDA lebih matang daripada OpenCL. Selain itu, dokumentasi dan contoh CUDA lebih banyak dan API yang lebih sederhana dan spesifik dibanding OpenCL.
 
+    \subsection{Struktur IDS Snort}
+
+      Komponen utama yang akan dioptimasi yaitu pencocokan string yang dilakukan setelah preproses. Pencocokan string dilakukan pada modul MPSE (\emph{multipattern search engine}). Modul ini dipanggil ketika \emph{rule} selesai dikelompokkan berdasarkan servis dan protokol seperti terlihat pada Gambar III.1 di bawah. Tiap \emph{rule group} akan memiliki \emph{instance} MPSE sendiri dan membentuk kamus sesuai \emph{rule} yang ada pada tiap \emph{rule group}.
+
+      \begin{figure}[htb]
+        \centering
+        \includegraphics[width=0.8\textwidth]{resources/snort3.png}
+        \caption[Arsitektur Snort versi 3]{Arsitektur Snort versi 3. Pencocokan dilakukan pada bagian Detect}
+      \end{figure}
+
+      Setelah pembentukan \emph{instance} dilakukan, maka input akan di-\emph{streaming}, dipreproses, dibagi berdasarkan \emph{rule group}, kemudian disuplai ke \emph{instance} MPSE yang terkait. Hasil pencocokan paket akan dikumpulkan dalam \emph{reducer} untuk kemudian dibandingkan dengan \emph{policy} apakah dianggap paket berbahaya atau tidak.
+
     \subsection{Algoritma Pencocokan \emph{Signature}}
 
-      Komponen utama yang akan dioptimasi yaitu pencocokan string. Diantara pencocokan pola yang digunakan pada Snort, versi Aho-Corasick memiliki runtime yang paling cepat menggunakan teknik \emph{multithreading} pada CPU. Idealnya, modul yang ingin dikembangkan akan melampaui kinerja dari Snort yang menggunakan algoritma ini.
+      Komponen utama yang akan dioptimasi yaitu pencocokan string. Diantara pencocokan pola yang digunakan pada Snort, versi Aho-Corasick memiliki runtime yang paling cepat menggunakan teknik \emph{multithreading} pada CPU. Idealnya, modul yang ingin dikembangkan akan melampaui kinerja dari Snort yang menggunakan algoritma Aho-Corasick ini.
       
       Berdasarkan pengujian eksperimen yang dilakukan oleh \cite{lin2013}, implementasi langsung dari algoritma ini tidak memiliki keunggulan yang signifikan pada GPU. Salah satu kendala dari algoritma AC (Aho-Corasick) adalah \emph{boundary matching problem}. Masalah ini bisa diatasi dengan menambahkan jangkauan pencarian sebesar pola terpanjang. Namun, efek dari trik ini adalah peningkatan kompleksitas yang cukup drastis dari $O(n)$ menjadi $O(n + ms)$. 
       
@@ -69,7 +81,7 @@
 
       Dalam satu blok, satu atau beberapa \emph{byte stream} akan ditempatkan sebagai lokasi awal satu \emph{thread}. Misal, dalam blok berisi 4.096 \emph{byte} dengan 512 \emph{thread}, \emph{thread} pertama akan memulai pencocokan pada posisi kelipatan 512. 
 
-      Akibat dari penugasan yang berulang, diharapkan kemungkinan ketimpangan muatan dari masing-masing \emph{thread} akan berkurang. Pengujian yang dilakukan oleh \cite{lin2013} menunjukkan hasil serupa. Sehingga, skema inilah yang akan digunakan dalam implementasi kode \emph{kernel}. Kode \emph{kernel} akan menerima \emph{stream} sebesar 64 MB untuk 512 \emph{thread}.
+      Akibat dari penugasan yang berulang, diharapkan kemungkinan ketimpangan muatan dari masing-masing \emph{thread} akan berkurang. Pengujian yang dilakukan oleh \cite{lin2013} menunjukkan hasil serupa. Sehingga, skema inilah yang akan digunakan dalam implementasi kode \emph{kernel}. %Kode \emph{kernel} akan menerima \emph{stream} sebesar 128 kB dengan 512 \emph{thread}.
       
       % Penyimpanan \emph{signature} mempengaruhi besar memori yang digunakan. Struktur yang digunakan akan menggunakan trie terkompresi. Struktur digunakan untuk memaksimalkan \emph{locality} sehingga mengurangi \emph{latency}. Selain itu, dengan menurunkan konsumsi memori, besar buffer yang dapat digunakan meningkat. Diharapkan, \emph{latency} dari pengiriman juga menurun.
       
@@ -77,7 +89,7 @@
       
       \subsection{Optimasi Latensi pada GPU}
       
-      Pencocokan pola dengan tabel transisi adalah aplikasi yang \emph{memory-bound}. Penyimpanan pola pada memori global adalah salah satu sumber latensi. Salah satu optimasi yang dapat digunakan yaitu menyimpan pola pada memori tekstur. Memori tesktur dapat digunakan untuk mengurangi latensi pada simpul yang berdekatan dalam dua dimensi. Berdasarkan \cite{lin2013}, penggunaan memori tekstur dapat menurunkan latensi hingga 12\%. Lebih lanjut, dapat dilakukan pemuatan baris pertama tabel transiisi, yaitu baris milik status awal, ke dalam \emph{shared memory} karena baris ini yang pasti akan digunakan semua \emph{thread}. Peningkatan dari memuat baris pertama ke \emph{shared memory} akan berdampak besar ke latensi sistem.
+      Pencocokan pola dengan tabel transisi adalah aplikasi yang \emph{memory-bound}. Penyimpanan pola pada memori global adalah salah satu sumber latensi. Salah satu optimasi yang dapat digunakan yaitu menyimpan pola pada memori tekstur. Memori tesktur dapat digunakan untuk mengurangi latensi pada simpul yang berdekatan dalam dua dimensi. Berdasarkan \cite{lin2013}, penggunaan memori tekstur dapat menurunkan latensi hingga 12\%. Lebih lanjut, dapat dilakukan pemuatan baris pertama tabel transisi, yaitu baris milik status awal, ke dalam \emph{shared memory} karena baris ini yang pasti akan digunakan semua \emph{thread}. Peningkatan dari memuat baris pertama ke \emph{shared memory} akan berdampak besar ke latensi sistem.
       
       % Memori konstanta unggul ketika pola yang dicocokkan sedikit bercabang. Jika pola yang dicocokkan sedikit bercabang, maka \emph{cache} dapat dimanfaatkan dan latensi berkurang secara signifikan. Namun, pada ruleset Talos, tidak banyak rule yang sama sehingga juga akan banyak terjadi \emph{cache miss}. Akibatnya memori konstanta tidak lagi unggul. 
       
@@ -133,7 +145,7 @@
 
         \item 
         \emph{Pattern builder} \\
-        \emph{Pattern builder} melakukan pembangkitan kamus dari masukan yang diambil dari \emph{ruleset}. Kamus dibentuk dengan menggunakan struktur tabel dua dimensi dengan baris sebagai status dan kolom sebagai status transisi. Setiap baris memiliki kolom sebesar 256 \emph{byte}.
+        \emph{Pattern builder} melakukan pembangkitan kamus dari \emph{ruleset}. Pola akan ditambahkan dalam bentuk \emph{list of string} untuk kemudian ditampung dalam \emph{buffer}. Kemudian \emph{buffer} akan diiterasi untuk membentuk kamus. Kamus yang dibentuk menggunakan struktur tabel dua dimensi dengan baris sebagai status dan kolom sebagai status transisi. Setiap baris memiliki kolom sebesar 256 \emph{byte}.
 
         \item
         \emph{Matcher} \\
@@ -144,5 +156,3 @@
         \emph{Reducer} akan menggabungkan hasil pencocokan dari tiap \emph{byte} sehingga diperoleh jumlah total rule yang terdeteksi. Jumlah ini akan dibandingkan dengan \emph{threshold} untuk menentukan apakah \emph{payload} perlu dilakukan pencocokan lebih lanjut atau tidak. \emph{Reducing} akan dilakukan secara sekuensial pada CPU.
         
       \end{enumerate}
-
-     % Berdasarkan analisis kebutuhan yang dijelaskan subbab sebelumnya, proses pengindeksan dan proses pencarian bisa dipisahkan karena dalam proses pencarian yang dibutuhkan hanyalah hasil indeks yang sudah jadi. Sehingga arsitektur solusi akan terbagi menjadi 2 buah sistem yaitu sistem untuk  pengindeksan dan sistem untuk pencarian.

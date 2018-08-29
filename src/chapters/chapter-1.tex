@@ -23,7 +23,6 @@
   Melakukan pencocokan pola secara paralel memiliki beberapa masalah yaitu algoritma yang digunakan, penyimpanan \emph{dictionary}, dan metode \emph{streaming} paket. Dan juga hasil yang diharapkan dapat menangani kasus dengan kapasitas aliran data yang besar. Maka dari itu, Tugas Akhir ini akan difokuskan pada pembangunan sistem deteksi intrusi jaringan paralel dengan GPU. Dalam rangka pembangunan sistem tersebut, terdapat beberapa permasalahan yang menjadi fokus perhatian dari penelitian ini, yaitu: 
 
   \begin{enumerate}
-      \item Apa saja rancangan-rancangan yang akan digunakan untuk pencocokan \emph{signature} dengan GPU?
       \item Bagaimana arsitektur yang memadai terkait pencocokan pola dengan GPU?
       \item Bagaimana kinerja sistem deteksi intrusi jaringan akibat dari penggunaan GPU?
   \end{enumerate}
@@ -32,7 +31,6 @@
 
   Tujuan dari pelaksanaan Tugas Akhir ini adalah sebagai berikut:
   \begin{enumerate}
-      \item Mencari rancangan-rancangan yang akan digunakan untuk pencocokan \emph{signature} dengan GPU
       \item Mengembangkan sebuah arsitektur yang memadai untuk pencocokan pola dengan GPU
       \item Melakukan perbandingan kinerja sistem deteksi intrusi jaringan sebelum dan setelah menggunakan GPU
   \end{enumerate}
@@ -41,10 +39,10 @@
 
   Merancang NIDS yang cepat dengan menggunakan GPU merupakan solusi yang cocok untuk menghadapi serangan yang semakin meningkat. Tugas Akhir ini akan difokuskan pada pembangunan sistem yang melakukan inspeksi paket secara cepat menggunakan komputasi paralel pada GPU. Dalam rangka pembangunan sistem tersebut, terdapat beberapa batasan yang digunakan dalam penelitian ini, yaitu:
   \begin{enumerate}
-      \item NIDS dibuat diatas NIDS Snort
+      \item NIDS dibuat di atas NIDS Snort
       \item NIDS menggunakan \emph{platform} GPGPU CUDA
       \item \emph{Payload} akan diambil dari \emph{log} jaringan berupa berkas PCAP
-      \item NIDS menggunakan \emph{rule} milik Talos yang disesuaikan
+      \item NIDS menggunakan \emph{rule} milik Snort VRT yang disesuaikan
   \end{enumerate}
 
 \section{Metodologi}
