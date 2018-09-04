@@ -9,7 +9,7 @@
 
   \subsection{Deteksi Intrusi}
 
-    Intrusi merupakan serangkaian percobaan yang tidak berhak, baik sukses maupun tidak, untuk menyusup masuk, mengakses, mengubah, atau menyalahgunakan sumber daya yang berharga sehingga sumber daya menjadi tidak dapat dipercaya atau bahkan digunakan \citep{kizza2015}. Proses intrusi sistem terbagi menjadi beberapa tahap. Proses dimulai dengan identifikasi target. Lalu target akan diperiksa secara menyeluruh dan dicari celah keamanannya. Selanjutnya dilakukan pengambilalihan akses ke sistem. Dan terakhir, sumber daya dalam sistem dapat dibaca, digunakan dan dimodifikasi. 
+    Intrusi merupakan serangkaian percobaan untuk menyusup masuk, mengakses, mengubah, atau menyalahgunakan sumber daya yang berharga yang tidak berhak, baik sukses maupun tidak sehingga sumber daya menjadi tidak dapat dipercaya atau bahkan digunakan \citep{kizza2015}. Proses intrusi sistem terbagi menjadi beberapa tahap. Proses dimulai dengan identifikasi target. Lalu target akan diperiksa secara menyeluruh dan dicari celah keamanannya. Selanjutnya dilakukan pengambilalihan akses ke sistem. Dan terakhir, sumber daya dalam sistem dapat dibaca, digunakan dan dimodifikasi. 
 
     Deteksi intrusi adalah kegiatan merekam, menganalisa, dan mendeteksi kemungkinan sebuah percobaan akses yang tidak berhak terhadap sebuah sistem \citep{kizza2015}. Adanya percobaan akses ilegal dapat mengindikasikan adanya serangan dari luar (\emph{hijacking}), maupun dari dalam (seperti \emph{malware}). Setelah serangan ditemukan, aktivitas akan dicatat ke log untuk ditindak lebih lanjut.
 
@@ -77,7 +77,7 @@
 
   \subsection{Implementasi Snort NIDPS}
 
-    Snort memliki beberapa modul; modul penangkap paket, modul \emph{decoder}, modul preproses, modul detektor, dan modul keluaran. Modul penangkap bertujuan mengambil paket dari lalu lintas jaringan. Lalu paket akan diproses dengan modul \emph{decoder} akan mengidentifikasi protokol paket dan mengklasifikasikannya berdasarkan spesifikasi data-link. Preproses bertujuan mengolah paket berdasarkan jenis protokol paket untuk kemudian siap dideteksi. Preproses juga bertujuan menyusun fragmen IP dan \emph{stream} TCP. Selain itu paket juga dicek jika berada diluar TCP \emph{window}, dan akan disusun ulang. Kemudian, paket akan masuk modul pencocokan. Modul ini akan mengelompokkan \emph{rule} dan paket berdasarkan grup yang disusun berdasarkan protokol, port, dan servis. Lalu terakhir, paket akan dicek oleh modul detektor menggunakan \emph{rule} yang tersedia dan mengirimkan hasilnya ke modul keluaran.
+    Snort memiliki beberapa modul; modul penangkap paket, modul \emph{decoder}, modul preproses, modul detektor, dan modul keluaran. Modul penangkap bertujuan mengambil paket dari lalu lintas jaringan. Lalu paket akan diproses dengan modul \emph{decoder} akan mengidentifikasi protokol paket dan mengklasifikasikannya berdasarkan spesifikasi data-link. Preproses bertujuan mengolah paket berdasarkan jenis protokol paket untuk kemudian siap dideteksi. Preproses juga bertujuan menyusun fragmen IP dan \emph{stream} TCP. Selain itu paket juga dicek jika berada diluar TCP \emph{window}, dan akan disusun ulang. Kemudian, paket akan masuk modul pencocokan. Modul ini akan mengelompokkan \emph{rule} dan paket berdasarkan grup yang disusun berdasarkan protokol, port, dan servis. Lalu terakhir, paket akan dicek oleh modul detektor menggunakan \emph{rule} yang tersedia dan mengirimkan hasilnya ke modul keluaran.
 
       \begin{figure}[htb]
         \centering
@@ -321,9 +321,9 @@
 
   \subsection{Rancangan NIDS berbasis GPGPU}
 
-    Selain rancangan \emph{multithreading} pada CPU, telah dilakukan penelitian tentang rancangan arsitektur untuk NIDS pada GPGPU oleh \cite{gnort2008}. Rancangan bertujuan mengakomodasi implementasi algoritma Aho-Corasick pada GPU. Beberapa komponen yang dimodifikasi yaitu implementasi \emph{state machine} dan skema transfer antara \emph{host} dan \emph{device}.
+    Selain rancangan \emph{multithreading} pada CPU, telah dilakukan penelitian tentang rancangan arsitektur untuk NIDS pada GPGPU oleh \cite{gnort2008}. Rancangan bertujuan mengakomodasi implementasi algoritma Aho-Corasick pada GPU. Implementasi berdasarkan pada NIDS Snort. Beberapa komponen yang dimodifikasi yaitu implementasi \emph{state machine} dan skema transfer antara \emph{host} dan \emph{device}. 
 
-    Implementasi Snort menggunakan struktur memori untuk menyimpan pola \emph{signature} yang berbentuk \emph{list of string}. \emph{Layout} ini kemudian dimodfikasi menjadi \emph{array} 2D sebelum diimplementasi menggunakan CUDA. Kelebihan \emph{layout} memori ini adalah mudah untuk ditransfer ke memori tekstur. Selain itu algoritma Aho-Corasick memanfaatkan prinsip \emph{locality} dengan baik. Sehingga implementasi memori dapat meningkatkan kinerja pencocokan NIPS hingga 19\%.
+    Implementasi menggunakan struktur memori untuk menyimpan pola \emph{signature} yang berbentuk \emph{list of string}. \emph{Layout} ini kemudian dimodfikasi menjadi \emph{array} 2D sebelum diimplementasi menggunakan CUDA. Kelebihan \emph{layout} memori ini adalah mudah untuk ditransfer ke memori tekstur. Selain itu algoritma Aho-Corasick memanfaatkan prinsip \emph{locality} dengan baik. Sehingga implementasi memori dapat meningkatkan kinerja pencocokan NIPS hingga 19\%.
 
     Transfer data dari \emph{host} ke \emph{device} maupun \emph{device} ke \emph{host} menggunakan skema \emph{double buffering}. Skema ini menggunakan sebuah \emph{buffer} untuk menampung paket yang ingin dicek menjadi satu batch besar. Batch besar kemudian ditransfer ke memori \emph{device}. Ketika GPU melakukan pemrosesan, maka paket yang baru datang akan ditampung dalam \emph{buffer} berbeda. Sehingga kedua \emph{buffer} dapat selalu bertukar posisi. Hal ini mampu meningkatkan utilitas pengiriman rata-rata paket. 
     
