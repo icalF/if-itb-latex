@@ -69,7 +69,13 @@
       
       Implementasi dari mesin PFAC yang digunakan ada beberapa macam. Salah satu model yang dapat digunakan yaitu dengan bentuk seperti pohon dengan \emph{list of pointer} ke status anak. Namun, model yang dialokasi secara dinamis tidak cocok digunakan dalam GPU karena alokasi pada GPU memiliki latensi yang tinggi. Selain itu, lokasi memori dapat menjadi tidak kontigu dan tidak mendukung adanya \emph{spatial locality}.
       
-      Opsi lainnya yaitu dengan tabel transisi dua dimensi. Untuk tiap status, akan dibuat daftar status transisi terhadap tiap karakter. Model ini lebih sederhana dan juga mendukung adanya \emph{memory coalescing}. Tabel akan dibentuk di \emph{host memory}. Setelah semua pola didaftarkan, tabel akan disalin ke GPU hanya sebesar ukuran tabel yang terisi agar tidak boros memori. Tiap baris menunjukkan transisi dari tiap status yang bukan status akhir dan memiliki 256 kolom.
+      Opsi lainnya yaitu dengan tabel transisi dua dimensi. Untuk tiap status, akan dibuat daftar status transisi terhadap tiap karakter. Model ini lebih sederhana dan juga mendukung adanya \emph{memory coalescing}. Tabel akan dibentuk di \emph{host memory}. Setelah semua pola didaftarkan, tabel akan disalin ke GPU hanya sebesar ukuran tabel yang terisi agar tidak boros memori. Tiap baris menunjukkan transisi dari tiap status yang bukan status akhir dan memiliki 256 kolom. Tabel transisi akan berbentuk seperti Gambar III.2 di bawah.
+
+      \begin{figure}[htb]
+        \centering
+        \includegraphics[width=0.6\textwidth]{resources/table.png}
+        \caption[Tabel transisi]{Tabel transisi dari \emph{state machine} kamus}
+      \end{figure}
 
       Untuk mengurangi kebutuhan terhadap penanda status akhir, nomor status akan disusun ulang. Status akhir akan diletakkan pada status pertama hingga ke-N. Sedangkan status lainnya termasuk status awal dimulai dari N+1. Dengan demikian, kebutuhan memori untuk penanda akan berkurang. Selain itu, operasi pengecekan dalam kode \emph{kernel} lebih sederhana dan ringan.
 
@@ -101,7 +107,7 @@
 
     \subsection{Gambaran Umum Solusi}
 
-      Berdasarkan  analisis  yang  telah  dilakukan, terpilih beberapa metode yang akan digunakan dalam NIDS yang akan dibangun. Metode pengembangan akan mengacu pada eksperimen \cite{lin2013} dengan sedikit penyesuaian untuk \emph{buffer payload} yang mengacu pada \cite{gnort2008}.
+      Berdasarkan analisis yang telah dilakukan, NIDS akan dikembangkan dari NIDS Snort dengan beberapa metode. Metode pengembangan akan mengacu pada implementasi \cite{lin2013} serta sedikit penyesuaian untuk berdasarkan \cite{gnort2008}.
       
       % Algoritma pencocokan yang akan digunakan adalah PFAC. Tabel transisi akan menggunakan tabel dua dimensi dengan jumlah kolom sebesar ukuran karakter, yaitu 256 \emph{byte}. Kemudian tabel ini akan diikat ke memori tekstur. Sedangkan \emph{buffer payload} akan menggunakan metode \emph{batching} dengan \emph{pinned memory}.
 
@@ -111,15 +117,21 @@
 
       \item
       Pembentukan tabel transisi \\
-      Pembentukan tabel transisi akan dilakukan saat persiapan pencocokan. Pembentukan dilakukan pada \emph{host} kemudian baru akan ditransfer ke \emph{device}. Pembentukan tabel transisi dilakukan dengan mengumpulkan pola terlebih dahulu. Setelah pola terkumpul, lalu simpul akan disusun kembali agar simpul akhir berada di bagian paling awal tabel. 
+      Pembentukan tabel transisi akan dilakukan saat persiapan pencocokan. Struktur
+      tabel dan operasi pembentukan didasarkan pada \cite{lin2013}. Struktur akan
+      menggunakan tabel transisi 2D dengan struktur internal larik 1D. Pembentukan dilakukan pada \emph{host} kemudian baru akan ditransfer ke \emph{device}. Pembentukan tabel transisi dilakukan dengan mengumpulkan pola terlebih dahulu. Setelah pola terkumpul, lalu \emph{state} akan disusun kembali agar \emph{state} akhir berada di bagian paling awal tabel. Sehingga \emph{state} selain \emph{state} akhir dimulai dari N+1 dengan N adalah jumlah pola. 
 
       \item
       Persiapan tabel transisi dalam \emph{device memory} \\
-      Setelah tabel transisi dibentuk, tabel akan dikirimkan ke \emph{device memory}. Penyimpanan pola akan diikat pada memori tekstur. Selain itu juga disiapkan tabel untuk menampung hasil pencocokan. Tabel akan dialokasikan sebesar jumlah \emph{thread} yang digunakan dalam pencocokan.
+      Setelah tabel transisi dibentuk, tabel akan dikirimkan ke \emph{device memory}. Penyimpanan pola akan diikat pada memori tekstur sesuai \cite{lin2013}. Selain itu juga disiapkan tabel untuk menampung hasil pencocokan. Tabel akan dialokasikan sebesar jumlah \emph{thread} yang digunakan dalam pencocokan.
+
+      \item
+      Penampungan \emph{stream} masukan \\
+      \emph{Stream} input akan ditampung dalam \emph{secondary buffer} hingga sebesar 256 kB. \emph{Buffer} akan dialokasi dengan \emph{pinned memory} untuk memungkinkan DMA (\emph{direct memory access}) dari memori \emph{host} ke \emph{device} \citep{gnort2008}. Kemudian setelah \emph{buffer} mendekati penuh, \emph{stream} akan ditransfer ke memori \emph{device}.
 
       \item
       Penelusuran automata \\
-      Pencocokan dilakukan dengan penelusuran mesin PFAC yang sudah dibentuk. String masukan akan dimuat pada \emph{shared memory}. Tiap \emph{thread} akan memulai pencocokan pada satu karakter di string masukan. Penelusuran dilakukan hingga mencapai status akhir. Jika status akhir bukan merupakan status dummy, maka hasil pencocokan akan diset pada tabel yang berada di global memori.
+      Pencocokan dilakukan dengan penelusuran mesin PFAC yang sudah dibentuk. \emph{Stream} masukan akan dimuat pada \emph{shared memory}. Tiap \emph{thread} akan memulai pencocokan pada satu karakter pada \emph{stream} masukan. Satu \emph{thread} melakukan pencocokan sebanyak 4 kali untuk mengurangi kemungkinan ketimpangan beban \citep{lin2013}. Penelusuran dilakukan hingga mencapai state akhir. Jika state akhir bukan merupakan state dummy, maka hasil pencocokan akan diset pada tabel hasil yang berada di \emph{global memory}.
 
       \end{enumerate}
 
@@ -145,14 +157,14 @@
 
         \item 
         \emph{Pattern builder} \\
-        \emph{Pattern builder} melakukan pembangkitan kamus dari \emph{ruleset}. Pola akan ditambahkan dalam bentuk \emph{list of string} untuk kemudian ditampung dalam \emph{buffer}. Kemudian \emph{buffer} akan diiterasi untuk membentuk kamus. Kamus yang dibentuk menggunakan struktur tabel dua dimensi dengan baris sebagai status dan kolom sebagai status transisi. Setiap baris memiliki kolom sebesar 256 \emph{byte}.
+        \emph{Pattern builder} melakukan pembangkitan kamus dari \emph{ruleset}. Pola akan ditambahkan dalam bentuk \emph{list of string} untuk kemudian ditampung dalam \emph{temporary table}. Kemudian \emph{temporary table} akan diiterasi untuk membentuk kamus. Kamus yang dibentuk menggunakan struktur tabel 2D dengan baris sebagai \emph{state} dan kolom sebagai status transisi. Setiap baris memiliki kolom sebesar 256 \emph{byte}.
 
         \item
         \emph{Matcher} \\
-        \emph{Matcher} akan menyalin \emph{payload} dari \emph{host buffer} ke \emph{device buffer}. Kemudian dari \emph{buffer} akan disalin ke \emph{shared memory}. Lalu \emph{matcher} akan melakukan pencocokan dengan menelusuri kamus secara paralel berdasarkan tiap karakter.
+        \emph{Matcher} akan menyalin \emph{stream} dari \emph{host buffer} ke \emph{device buffer}. Kemudian \emph{stream} dari \emph{buffer} akan disalin ke \emph{shared memory}. Setelah \emph{stream} siap, \emph{matcher} akan melakukan pencocokan dengan menelusuri kamus secara paralel berdasarkan tiap karakter.
 
         \item
         \emph{Reducer} \\
-        \emph{Reducer} akan menggabungkan hasil pencocokan dari tiap \emph{byte} sehingga diperoleh jumlah total rule yang terdeteksi. Jumlah ini akan dibandingkan dengan \emph{threshold} untuk menentukan apakah \emph{payload} perlu dilakukan pencocokan lebih lanjut atau tidak. \emph{Reducing} akan dilakukan secara sekuensial pada CPU.
+        \emph{Reducer} akan menggabungkan hasil pencocokan dari tiap \emph{byte} sehingga diperoleh jumlah total rule yang terdeteksi. Jumlah ini akan dibandingkan dengan \emph{policy} oleh Snort untuk menentukan apakah \emph{stream} dianggap berbahaya atau tidak. \emph{Reducing} akan dilakukan secara sekuensial pada CPU.
         
       \end{enumerate}

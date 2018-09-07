@@ -42,15 +42,15 @@ Pembahasan pada bab ini akan dibagi menjadi dua bagian. Bagian pertama dipaparka
 
       \item
       \emph{State machine} \\
-      \emph{State machine} merupakan kamus yang digunakan dalam pencocokan. \emph{State machine} dibentuk di memori \emph{host}. Pola yang telah dikumpulkan dalam \emph{list}, akan disusun ulang sehingga terurut secara alfabetis. Kemudian akan dilakukan penelusuran DFS (\emph{depth-first search}) untuk membangun indeks status.
+      \emph{State machine} merupakan kamus yang digunakan dalam pencocokan. \emph{State machine} dibentuk di memori \emph{host}. Pola yang telah dikumpulkan dalam \emph{list}, akan disusun ulang sehingga terurut secara alfabetis. Kemudian akan dilakukan penelusuran DFS (\emph{depth-first search}) untuk membangun transisi tiap \emph{state}.
 
       \item
       \emph{Kernel wrapper} \\
-      \emph{Kernel wrapper} adalah \emph{wrapper} yang menyiapkan \emph{payload} sebelum \emph{kernel} dijalankan. \emph{Wrapper} akan menyalin \emph{payload} dari \emph{host buffer} ke \emph{device buffer}. Setelah persiapan selesai, \emph{wrapper} akan memanggil kode \emph{kernel} untuk menjalankan pencocokan.\clearpage
+      \emph{Kernel wrapper} adalah \emph{wrapper} yang menyiapkan \emph{payload} sebelum \emph{kernel} dijalankan. \emph{Wrapper} akan menyalin \emph{payload} dari \emph{host buffer} ke \emph{device buffer}. Setelah persiapan selesai, \emph{wrapper} akan memanggil kode \emph{kernel} untuk menjalankan pencocokan.
       
       \item
       \emph{Matcher kernel} \\
-      \emph{Kernel} adalah kode GPU yang akan dijalankan untuk pencocokan. \emph{Kernel} hanya akan melakukan \emph{looping} terhadap nomor status berdasarkan tabel transisi yang telah dimuat. \emph{Looping} akan berhenti ketika status telah menuju status akhir maupun status \emph{dummy}.
+      \emph{Kernel} adalah kode GPU yang akan dijalankan untuk pencocokan. \emph{Kernel} hanya akan melakukan \emph{looping} terhadap nomor \emph{state} berdasarkan tabel transisi yang telah dimuat. \emph{Looping} akan berhenti ketika \emph{state} telah menuju \emph{state} akhir maupun status \emph{dummy}.
 
       \item
       \emph{Reducer} \\
