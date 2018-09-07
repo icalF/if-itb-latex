@@ -9,17 +9,15 @@
 % Berkas ini berisi struktur utama dokumen LaTeX yang akan dibuat.
 %
 %--------------------------------------------------------------------%
-
 \documentclass[11pt, a4paper, onecolumn, oneside, final]{book}
 
 \input{config/if-itb-thesis.sty}
-%\input{config/hyphenation.tex}
 
 \makeatletter
 
 \makeatother
 
-%\bibliography{references}{}
+%\bibliography{references}
 
 \begin{document}
 
@@ -34,26 +32,26 @@
     \frontmatter
     \input{chapters/cover}
     \input{chapters/approval}
-    % \input{chapters/statement}
+    \input{chapters/statement}
 
     \pagestyle{plain}
 
     %\input{chapters/abstract-id}
     % \input{chapters/abstract-en}
-    % \input{chapters/forewords}
+    \input{chapters/forewords}
 
     \titleformat*{\section}{\centering\bfseries\Large\MakeUpperCase}
     
-    \addcontentsline{toc}{chapter}{DAFTAR ISI} 
     \tableofcontents
-    
+    \addcontentsline{toc}{chapter}{DAFTAR ISI} 
+    % \afterpage{\null\newpage}
+    % \addcontentsline{toc}{chapter}{DAFTAR LAMPIRAN}
     {%
         \let\oldnumberline\numberline%
         \renewcommand{\numberline}{\figurename~\oldnumberline}%
         \listoffigures%
     }
     \addcontentsline{toc}{chapter}{DAFTAR GAMBAR}  
-    
     {%
         \let\oldnumberline\numberline%
         \renewcommand{\numberline}{\tablename~\oldnumberline}%
@@ -82,11 +80,12 @@
     %----------------------------------------------------------------%
 
     % Daftar pustaka
+    % Bibliography to Daftar Pustaka
     \renewcommand{\bibname}{Daftar Pustaka}
     \cleardoublepage
     \phantomsection
     \addcontentsline{toc}{chapter}{DAFTAR PUSTAKA}
-    % \printbibliography[title=Daftar Pustaka]
+    %\printbibliography
     \bibliography{references}
     \bibliographystyle{apa}
 

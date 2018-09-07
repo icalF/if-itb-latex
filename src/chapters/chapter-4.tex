@@ -72,11 +72,11 @@ Pembahasan pada bab ini akan dibagi menjadi dua bagian. Bagian pertama dipaparka
 \section{Pengujian}
 
   \subsection{Tujuan Pengujian}
-    Pengujian dilakukan untuk mendapatkan perbandingan kinerja antara modul yand dikembangkan dan modul yang ada dalam NIDS Snort. 
+    Pengujian dilakukan untuk mendapatkan perbandingan kinerja antara modul yang dikembangkan dan modul yang ada dalam NIDS Snort. 
 
   \subsection{Skenario Pengujian}
   
-  Pengujian dilakukan untuk mengukur peningkatan kinerja deteksi Snort. Skenario yang akan diujikan meliputi strategi-strategi yang dibahas pada Subbab III.2. Berikut ini adalah tipe-tipe skenario yang diuji dalam pengujian ini.
+    Pengujian dilakukan untuk mengukur peningkatan kinerja deteksi Snort. Skenario yang akan diujikan meliputi strategi-strategi yang dibahas pada Subbab III.2. Berikut ini adalah tipe-tipe skenario yang diuji dalam pengujian ini.
 
     \begin{enumerate}
       
@@ -97,11 +97,20 @@ Pembahasan pada bab ini akan dibagi menjadi dua bagian. Bagian pertama dipaparka
 
     \end{enumerate}
 
+    Kelima skenario akan diuji dengan jumlah \emph{thread block} dan \emph{dataset} berbeda.
+
   \subsection{Hasil Pengujian}
 
-    Berikut merupakan hasil pengujian dari seluruh skenario di atas. \emph{Ruleset} yang digunakan yaitu Snort VRT \emph{ruleset} versi 3000. Sedangkan berkas masukan didapatkan dari \emph{log traffic} kompetisi DEFCON 25 yang berlangsung pada bulan Juli tahun 2017. Dataset didapatkan dari jaringan \emph{torrent} milik arsip DEFCON berupa PCAP sebesar 8 GB.
+    Berikut merupakan hasil pengujian dari seluruh skenario di atas. \emph{Ruleset} yang digunakan yaitu Snort VRT \emph{ruleset} versi 3000. Sedangkan berkas masukan didapatkan dari \emph{log traffic} kompetisi DEFCON 25 yang berlangsung pada bulan Juli tahun 2017. Dataset didapatkan dari jaringan \emph{torrent} milik arsip DEFCON berupa beberapa berkas PCAP sebesar sekitar 2,6 GB.
 
-    \input{tables/test-result.tex}
+    \input{tables/test-result.tex}  
 
   \subsection{Analisis Hasil Pengujian}
-    % \blindtext
+    
+    Dari hasil pengujian, didapatkan bahwa hasil skenario 1 memilki kapasitas paling rendah. Alasannya yaitu karena operasi pencocokan sering melakukan \emph{fetch} ke \emph{global memory}. 
+    
+    Skenario 2 secara umum lebih cepat beberapa kali daripada skenario 1. Sekitar ? hingga ? kali lipat lebih cepat. Karena latensi antara \emph{global memory} dan \emph{shared memory} terpaut jauh sehingga mengakibatkan kapasitas meningkat.
+
+    Skenario 3 tidak terlalu berpengaruh terhadap skenario 2. Keuntungan \emph{pinned memory} tidak terlalu terlihat bahkan cenderung memperlambat. Sejalan dengan eksperimen yang dilakukan \cite{gnort2008}, \emph{pinned memory} memiliki \emph{overhead} saat alokasi dan dealokasi.
+
+    Sedangkan skenario 4 
