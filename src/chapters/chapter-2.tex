@@ -268,7 +268,7 @@
 
     % \footnotetext{Nvidia}
 
-    Selain ketiga memori tersebut, ada juga memori yang hanya dapat ditulis oleh \emph{host} yaitu memori konstanta dan tekstur. Kedua memori ini hanya dapat ditulis sekali sebelum \emph{kernel} dipanggil. Keuntungan menggunakan kedua memori ini yaitu latensi akses yang lebih kecil dari memori global. Hal ini terjadi karena kedua memori ini memanfaatkan \emph{locality} dalam akses memori. Memori konstanta menggunakan \emph{cache} sehingga akses untuk memori yang sama berkali-kali akan sangat cepat. Sedangkan memory tekstur menggunakan \emph{spatial locality} untuk \emph{thread} yang berdekatan secara dua dimensi.
+    Selain ketiga memori tersebut, ada juga memori yang hanya dapat ditulis oleh \emph{host} yaitu memori konstanta dan tekstur. Kedua memori ini hanya dapat ditulis sekali sebelum \emph{kernel} dipanggil. Keuntungan menggunakan kedua memori ini yaitu latensi akses yang lebih kecil dari memori global. Hal ini terjadi karena kedua memori ini memanfaatkan \emph{locality} dalam akses memori. Memori konstanta menggunakan \emph{cache} sehingga akses untuk memori yang sama berkali-kali akan sangat cepat. Sedangkan memory tekstur menggunakan \emph{spatial locality} untuk \emph{thread} yang berdekatan.
 
   % Saat ini ada dua platform GPGPU yang populer, CUDA dan OpenCL. CUDA adalah platform yang dikembangkan oleh NVIDIA. CUDA hanya dapat berjalan pada perangkat milik NVIDIA. Sedangkan OpenCL dikembangkan oleh grup konsorsium Khronos. OpenCL dapat berjalan pada banyak perangkat, seperti CPU, GPU, FPGA, dan DSP (\emph{digital signal processor})).
   
