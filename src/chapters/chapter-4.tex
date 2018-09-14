@@ -97,11 +97,11 @@ Pembahasan pada bab ini akan dibagi menjadi dua bagian. Bagian pertama dipaparka
 
     \end{enumerate}
 
-    Kelima skenario akan diuji dengan jumlah \emph{thread block} dan \emph{dataset} berbeda.
+    Kelima skenario akan diuji dengan ukuran \emph{buffer} berbeda.
 
   \subsection{Hasil Pengujian}
 
-    Berikut merupakan hasil pengujian dari seluruh skenario di atas. \emph{Ruleset} yang digunakan yaitu Snort VRT \emph{ruleset} versi 3000. Sedangkan berkas masukan didapatkan dari \emph{log traffic} kompetisi DEFCON 25 yang berlangsung pada bulan Juli tahun 2017. Dataset didapatkan dari jaringan \emph{torrent} milik arsip DEFCON berupa beberapa berkas PCAP sebesar sekitar 2,6 GB.
+    Berikut merupakan hasil pengujian dari seluruh skenario di atas. \emph{Ruleset} yang digunakan yaitu Snort VRT \emph{ruleset} versi 3000. Sedangkan berkas masukan didapatkan dari \emph{log traffic} kompetisi DEFCON 25 yang berlangsung pada bulan Juli tahun 2017. Dataset didapatkan dari jaringan \emph{torrent} milik arsip DEFCON berupa beberapa berkas PCAP sebesar sekitar 2,6 GB. Berikut adalah hasil pengujian pada ukuran \emph{buffer} berbeda.\clearpage
 
     \input{tables/test-result.tex}  
 
@@ -113,4 +113,4 @@ Pembahasan pada bab ini akan dibagi menjadi dua bagian. Bagian pertama dipaparka
 
     Skenario 3 tidak terlalu berpengaruh terhadap skenario 2. Keuntungan \emph{pinned memory} tidak terlalu terlihat bahkan cenderung memperlambat. Sejalan dengan eksperimen yang dilakukan \cite{gnort2008}, \emph{pinned memory} memiliki \emph{overhead} saat alokasi dan dealokasi.
 
-    Sedangkan skenario 4 
+    Sedangkan skenario 4 baru terlihat perbedaan signifikan terhadap skenario 2 dan 3 pada \emph{buffer} sebesar 1 MB ke atas. Adanya \emph{cache} pada memori tekstur membantu menurunkan akses ke memori global dan meningkatkan kinerja keseluruhan modul.

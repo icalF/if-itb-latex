@@ -77,13 +77,17 @@
 
   \subsection{Implementasi Snort NIDPS}
 
-    Snort memiliki beberapa modul; modul penangkap paket, modul \emph{decoder}, modul preproses, modul detektor, dan modul keluaran. Modul penangkap bertujuan mengambil paket dari lalu lintas jaringan. Lalu paket akan diproses dengan modul \emph{decoder} akan mengidentifikasi protokol paket dan mengklasifikasikannya berdasarkan spesifikasi data-link. Preproses bertujuan mengolah paket berdasarkan jenis protokol paket untuk kemudian siap dideteksi. Preproses juga bertujuan menyusun fragmen IP dan \emph{stream} TCP. Selain itu paket juga dicek jika berada diluar TCP \emph{window}, dan akan disusun ulang. Kemudian, paket akan masuk modul pencocokan. Modul ini akan mengelompokkan \emph{rule} dan paket berdasarkan grup yang disusun berdasarkan protokol, port, dan servis. Lalu terakhir, paket akan dicek oleh modul detektor menggunakan \emph{rule} yang tersedia dan mengirimkan hasilnya ke modul keluaran.
-
-      \begin{figure}[htb]
-        \centering
-        \includegraphics[width=0.8\textwidth]{resources/snort3.png}
-        \caption[Arsitektur Snort versi 3]{Arsitektur Snort versi 3}
-      \end{figure}
+    Snort memiliki beberapa modul; modul penangkap paket, modul \emph{decoder}, modul preproses, modul detektor, dan modul keluaran. Pada Snort versi 3.0, preproses dibedakan menjadi dua proses, yaitu \emph{stream} dan \emph{service} Alur paket dari mulai akusisi sampai paket berhasil dideteksi dan ditindak kurang lebih seperti Gambar II.1 berikut.
+    
+    \begin{figure}[htb]
+      \centering
+      \includegraphics[width=0.8\textwidth]{resources/snort3.png}
+      \caption[Arsitektur Snort versi 3]{Arsitektur Snort versi 3}
+    \end{figure}
+    
+    Modul penangkap bertujuan mengambil paket dari lalu lintas jaringan. Lalu paket akan diproses dengan modul \emph{decoder} akan mengidentifikasi protokol paket dan mengklasifikasikannya berdasarkan spesifikasi data-link. Preproses bertujuan mengolah paket berdasarkan jenis protokol paket untuk kemudian siap dideteksi. Ini sekarang dilakukan dalam komponen \emph{service}. Preproses juga bertujuan menyusun fragmen IP dan \emph{stream} TCP yang dilakukan pada komponen \emph{stream}. Selain itu paket juga dicek jika berada diluar TCP \emph{window}, dan akan disusun ulang. 
+    
+    Kemudian, paket akan masuk modul pencocokan. Modul ini akan mengelompokkan \emph{rule} dan paket berdasarkan grup yang disusun berdasarkan protokol, port, dan servis. Lalu terakhir, paket akan dicek oleh modul detektor menggunakan \emph{rule} yang tersedia dan mengirimkan hasilnya ke modul keluaran.
 
     % \footnotetext{Snort}
 
@@ -359,7 +363,7 @@
     
     Opsi dapat mengandung PCRE (\emph{Perl Compatible Regular Expression}). Sebelum PCRE dicocokkan, PCRE akan dipreproses menjadi DFA terlebih dahulu menggunakan algoritma Thompson. Kemudian pencocokan opsi dapat dilakukan menggunakan metode yang serupa dengan pencocokan \emph{multistring}.
 
-    Salah satu optimasi yang diajukan untuk tahap pencocokan yaitu penggunaan \emph{pipelining}. \emph{Pipelining} dilakukan dengan memisahkan \emph{thread} yang digunakan untuk operasi \emph{I/O} dengan operasi analisis. Kemudian pada tiap operasi \emph{I/O}, akan dilakukan pengumpulan paket dalam \emph{batch} sebelum dilakukan transfer antar komponen. 
+    Sehingga dalam penelitian ini, diajukan beberapa optimasi untuk pencocokan \emph{rule option}. Salah satu optimasi yang diajukan untuk tahap pencocokan yaitu penggunaan \emph{pipelining}. \emph{Pipelining} dilakukan dengan memisahkan \emph{thread} yang digunakan untuk operasi \emph{I/O} dengan operasi analisis. Kemudian pada tiap operasi \emph{I/O}, akan dilakukan pengumpulan paket dalam \emph{batch} sebelum dilakukan transfer antar komponen. Implementasi dilakukan dengan menggunakan basis IDS Snort.
 
     Pengujian dilakukan dengan konfigurasi CPU ganda Intel X5680 dengan 12 core dan dua GPU NVIDIA GTX 580. Hasil yang didapatkan menggunakan desain ini mampu mencapai 1,5 sampai 4 kali lipat kinerja Snort. \emph{Latency} dapat menurun hingga 13 mikrodetik pada \emph{offloading} paket awal untuk batch sebesar 1,5 kB. Pada pengujian dengan \emph{traffic} jaringan, rancangan ini mampu mencapai \emph{throughput} 25,2 Gbps pada \emph{input} sebesar 40 Gbps.
 

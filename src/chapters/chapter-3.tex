@@ -18,7 +18,9 @@
 
     %Meski demikian, masih ada beberapa masalah terjadi dalam desain yang telah diajukan. Pencocokan paket masih menggunakan algoritma yang berbasis backtracking sehingga banyak operasi sinkronisasi yang menghambat laju pencocokan dengan multithread.  Selain itu, opsi pada rule seringkali tidak dapat dicocokkan dengan sekali asd
 
-    Berdasarkan pengukuran yang dilakukan oleh \cite{kargus2012}, didapatkan bahwa sebagian besar beban analisa paket berada pada tahap pencarian string pada \emph{payload} paket. Pada tahapan ini, sebagian besar paket yang tidak terindikasi sebagai serangan akan diloloskan. Sehingga beban pencocokan pada tahap berikutnya, yaitu pencocokan \emph{option rule} akan berkurang drastis. Maka, fokus dari solusi yang akan diajukan yaitu implementasi desain yang akan mempercepat kinerja pencocokan string paket pada NIDS Snort.
+    Berdasarkan pengukuran yang dilakukan oleh \cite{kargus2012}, didapatkan bahwa sebagian besar beban analisa paket berada pada tahap pencarian string pada \emph{payload} paket. Pada tahapan ini, sebagian besar paket yang tidak terindikasi sebagai serangan akan diloloskan. Sehingga beban pencocokan pada tahap berikutnya, yaitu pencocokan \emph{option rule} akan berkurang drastis. Maka, fokus dari solusi yang akan diajukan yaitu implementasi desain yang akan mempercepat kinerja pencocokan string paket pada NIDS Snort. 
+    
+    Implementasi yang diajukan akan menggunakan metode dari \cite{lin2013} serta sedikit modifikasi dari \cite{gnort2008}. \cite{lin2013} mengajukan pendekatan berbeda dalam implementasi algoritma Aho-Corasick untuk pencocokan paralel pada GPU. Selain itu, dilakukan pula beberapa teknik untuk mengurangi latensi sistem secara keseluruhan. 
 
   \section{Analisis Solusi}
 
@@ -28,7 +30,7 @@
 
     \subsection{Struktur IDS Snort}
 
-      Komponen utama yang akan dioptimasi yaitu pencocokan string yang dilakukan setelah preproses. Pencocokan string dilakukan pada modul MPSE (\emph{multipattern search engine}). Modul ini dipanggil ketika \emph{rule} selesai dikelompokkan berdasarkan servis dan protokol seperti terlihat pada Gambar III.1 di bawah. Tiap \emph{rule group} akan memiliki \emph{instance} MPSE sendiri dan membentuk kamus sesuai \emph{rule} yang ada pada tiap \emph{rule group}.
+      Komponen utama yang akan dioptimasi yaitu pencocokan string yang dilakukan setelah preproses. Pencocokan string dilakukan dengan mengimplementasi \emph{interface} MPSE (\emph{multipattern search engine}) yang terdapat pada modul \emph{detect}. Modul ini dipanggil ketika \emph{rule} selesai dikelompokkan berdasarkan servis dan protokol seperti terlihat pada Gambar III.1 di bawah. Tiap \emph{rule group} akan memiliki \emph{instance} MPSE sendiri dan membentuk kamus sesuai \emph{rule} yang ada pada tiap \emph{rule group}.
 
       \begin{figure}[htb]
         \centering

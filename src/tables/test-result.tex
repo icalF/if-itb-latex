@@ -2,23 +2,56 @@
 \begin{center}
 \caption {Hasil Pengujian}
 
-    \begin{tabular}{|p{4cm}|p{4cm}|p{4cm}|}
+    \begin{tabular}{|c|c|c|c|}
 
     \hline
     \rowcolor{gray!10}
-    Skenario & Runtime (detik) & Speedup \\
+    Skenario & \emph{Buffer} (kB) & Runtime (detik) & Speedup \\
     \hline
 
-    \emph{Baseline} & 94.631856 & 1 \\
+    \multirow{4}{*}{\emph{Baseline}} & 128 & 94.632 & \multirow{4}{*}{1} \\
+    \cline{2-3}
+    & 512 & 92.656 & \\
+    \cline{2-3}
+    & 1024 & 90.118 & \\
+    \cline{2-3}
+    & 2048 & 96.097 & \\
     \hline
     
-    Skenario 1 & 424.277725 & 0.21 \\
+    \multirow{4}{*}{Skenario 1} & 128 & 450.629 & 0.21 \\
+    \cline{2-4}
+    & 512 & 463.281 & 0.2 \\
+    \cline{2-4}
+    & 1024 & 500.656 & 0.18 \\
+    \cline{2-4}
+    & 2048 & 436.805 & 0.22 \\
     \hline
     
-    Skenario 2 & 265.578648 & 0.4 \\
+    \multirow{4}{*}{Skenario 2} & 128 & 29.207 & 3.4 \\
+    \cline{2-4}
+    & 512 & 39.321 & 3.16 \\
+    \cline{2-4}
+    & 1024 & 31.29 & 2.88 \\
+    \cline{2-4}
+    & 2048 & 31.302 & 3.07 \\
     \hline
     
-    Skenario 3 & 265.913109 & 0.4 \\
+    \multirow{4}{*}{Skenario 3} & 128 & 31.44 & 3.01 \\
+    \cline{2-4}
+    & 512 & 38.446 & 2.41 \\
+    \cline{2-4}
+    & 1024 & 35.202 & 2.56 \\
+    \cline{2-4}
+    & 2048 & 31.404 & 3.06 \\
+    \hline
+
+    \multirow{4}{*}{Skenario 4} & 128 & 30.825 & 3.07 \\
+    \cline{2-4}
+    & 512 & 29.137 & 3.18 \\
+    \cline{2-4}
+    & 1024 & 22.417 & 4.02 \\
+    \cline{2-4}
+    & 2048 & 20.446 & 4.7 \\
     \hline
 
     \end{tabular}

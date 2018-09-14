@@ -9,15 +9,15 @@
         Peningkatan kinerja pencocokan string pada IDS Snort menggunakan GPU berhasil dilakukan dengan cara mengubah pendekatan algoritma yang digunakan agar memaksimalkan utilisasi GPU hingga 60-70\%.
 
         \item
-        Implementasi dilakukan dengan berbasis pada rancangan \cite{lin2013}, yaitu dengan Aho-Corasick varian tanpa \emph{failure function} dan delegasi \emph{thread} per karakter.
+        Implementasi dilakukan dengan berbasis pada rancangan \cite{lin2013}, yaitu dengan Aho-Corasick varian tanpa \emph{failure function} dan delegasi \emph{thread} per karakter. Teknik ini memanfaatkan kemampuan GPU untuk membangkitakan banyak \emph{thread} serta \emph{memory coalescing} ketika mengakses karakter yang bersebelahan dalam \emph{stream}.
         
         \item 
         Operasi pencocokan string dari kamus merupakan operasi yang \emph{memory bound} sehingga dilakukan beberapa teknik untuk mengurangi \emph{latency gap} antara akses I/O, memori dan komputasi GPU. Di antara teknik yang digunakan yaitu penggunaan \emph{pinned memory} pada \emph{buffer input} dan \emph{texture memory} pada kamus. Selain itu, digunakan juga penggunaan \emph{shared memory} untuk menampung \emph{buffer input} dan tabel transisi dari \emph{state} awal untuk menghemat \emph{fetch} pada memori global.
 
         \item
-        Parametrisasi dapat dilakukan pada jumlah \emph{thread} tiap \emph{block} dan ukuran \emph{buffer input}. Kedua besaran ini saling berhubungan jumlah \emph{thread} 
+        Parametrisasi dapat dilakukan pada jumlah \emph{thread} tiap \emph{block} dan ukuran \emph{buffer input}. Dengan menambah ukuran \emph{buffer input}, jumlah pengiriman paket dari \emph{host} ke \emph{device} dapat berkurang dan dapat menurunkan latensi secara drastis.
         
-    \end{enumerate}
+    \end{enumerate}\clearpage
 
 \section{Saran}
     Pengembangan yang dapat dilakukan selanjutnya terkait tugas akhir ini adalah sebagai berikut:
@@ -28,9 +28,15 @@
         Pencocokan dilakukan oleh beberapa MPSE \emph{instance} secara simultan dengan memanfaatkan \emph{semaphore}.
 
         \item
-        Melakukan penghematan transfer 
+        Melakukan penghematan transfer memori dari \emph{host} ke \emph{device} dengan hanya menggunakan satu struktur data.
 
         \item
-        Jumlah alokasi yang dilakukan dapat dikurangi dan memori dapat di-\emph{reuse} untuk menghindari asd
+        Penggunaan CUDA \emph{stream} untuk melakukan pengiriman memori dari \emph{host} ke \emph{device} maupun sebaliknya secara \emph{asynchronous} sehingga meningkatkan utilisasi komputasi GPU.
+
+        \item
+        Jumlah alokasi yang dilakukan dapat dikurangi dan memori dapat di-\emph{reuse} untuk menghindari \emph{memory leak}.
+
+        \item
+        Variasi jumlah \emph{thread} dalam \emph{block} dan ukuran \emph{shared memory}.
         
     \end{enumerate}
