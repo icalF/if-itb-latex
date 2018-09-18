@@ -1,10 +1,13 @@
-\documentclass[10pt]{beamer}
+\documentclass[10pt,xcolor=table]{beamer}
 
 \usetheme{metropolis}
 \usepackage{appendixnumberbeamer}
 
 \usepackage{booktabs}
 \usepackage[scale=2]{ccicons}
+
+\usepackage{multirow}
+% \usepackage{multicolumn}
 
 \usepackage{pgfplots}
 \usepgfplotslibrary{dateplot}
@@ -14,7 +17,7 @@
 
 \title{Optimasi Pencocokan Pola dalam Sistem Deteksi Intrusi Snort Menggunakan GPU}
 % \subtitle{A modern beamer theme}
-\date{\today}
+\date{}
 \author{Afrizal Fikri}
 \institute{13513004}
 % \titlegraphic{\hfill\includegraphics[height=1.5cm]{logo.pdf}}
@@ -70,19 +73,8 @@
 
         \item Porsi analisis terbesar ada pada bagian pencocokan string
 
-        \item Perkembangan GPU yang lebih cepat dan murah sebagai alternatif 
-        penggunaan CPU
+        \item Perkembangan GPU yang lebih cepat dan murah sebagai alternatif penggunaan CPU
         \item Kebutuhan akan implementasi pada GPU yang meminimalkan latensi
-
-    \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Kondisi Saat Ini}
-    \begin{itemize}
-
-        \item 
-
-        \item 
 
     \end{itemize}
 \end{frame}
@@ -90,9 +82,7 @@
 \begin{frame}[fragile]{Rumusan Masalah}
     \begin{enumerate}
 
-        \item Apa saja rancangan yang akan digunakan dalam pencocokan \emph{signature dengan} GPU?
-
-        \item Bagaimana arsitektur yang memadai terkait pencocokan pola dengan GPU?
+        \item Bagaimana implementasi pencocokan pola dengan GPU pada IDS Snort?
 
         \item Bagaimana kinerja sistem deteksi intrusi jaringan akibat dari penggunaan GPU?
 
@@ -102,9 +92,7 @@
 \begin{frame}[fragile]{Tujuan}
     \begin{enumerate}
         
-        \item Mencari rancangan-rancangan yang akan digunakan untuk pencocokan signature dengan GPU
-        
-        \item Mengembangkan sebuah arsitektur yang memadai untuk pencocokan pola dengan GPU
+        \item Mengembangkan modul pencocokan pola dengan GPU yang terintegrasi dengan Snort IDS
         
         \item Melakukan perbandingan kinerja sistem deteksi intrusi jaringan sebelum dan setelah menggunakan GPU
 
@@ -189,7 +177,7 @@
         \midrule
         Porsi tiap \emph{thread seimbang} & \emph{Thread} memiliki umur yang pendek \\
         Butuh ekstensi sepanjang pola terpanjang minus satu & Tiap \emph{thread} hanya bertugas mencari satu pola\\
-         & Banyak terjadi \emph{overlap} dalam akses \emph{stream input}\\
+            & Banyak terjadi \emph{overlap} dalam akses \emph{stream input}\\
         % \emph{Matcher kernel} & Kode GPU yang melakukan penelusuran \emph{state machine}\\
         % \emph{Reducer} & Komponen yang menggabungkan hasil pencocokan untuk dikembalikan ke Snort\\
         \bottomrule
@@ -214,21 +202,21 @@
     \begin{columns}[T,onlytextwidth]
         \column{0.5\textwidth}
 
-          \begin{block}{\emph{Linked trie}}
+            \begin{block}{\emph{Linked trie}}
             \begin{itemize}
                 \item Status terenkapsulasi
                 \item Mudah dimodifikasi
             \end{itemize}
-          \end{block}
+            \end{block}
     
         \column{0.5\textwidth}
     
-          \begin{block}{Tabel transisi}
+            \begin{block}{Tabel transisi}
             \begin{itemize}
                 \item Mudah diimplementasi
                 \item Cenderung statik
             \end{itemize}
-          \end{block}
+            \end{block}
     
     \end{columns}
 \end{frame}
@@ -283,6 +271,13 @@
     \end{enumerate}
 \end{frame}
 
+\begin{frame}{Tabel Transisi}
+    \begin{figure}
+        \centering
+        \includegraphics[width=1.0\textwidth]{../src/resources/table.png}
+    \end{figure}
+\end{frame}
+
 \begin{frame}{Arsitektur Snort}
     \begin{figure}
         \centering
@@ -313,21 +308,95 @@
     \end{table}
 \end{frame}
 
-\section{Demo}
+\section{Pengujian}
+
+\begin{frame}{Skenario Pengujian}
+    Pengujian dilakukan dengan melakukan analisis paket dalam berkas PCAP. Berkas didapatkan dari arsip DEFCON sebesar 2,6 GB
+
+    Pengujian dilakukan dengan besar \emph{buffer} berbeda dan 5 skenario:
+    \begin{enumerate}
+        \item \emph{Baseline} (AC \emph{multithread} CPU)
+        \item Skenario 1: PFAC dengan \emph{global memory}
+        \item Skenario 2: PFAC dengan \emph{shared memory}
+        \item Skenario 3: PFAC dengan \emph{shared memory} dan \emph{pinned memory}
+        \item Skenario 4: PFAC dengan \emph{shared memory}, \emph{pinned memory} dan \emph{texture memory}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Hasil Pengujian}
+    \begin {table}[h]
+        \begin{center}
+            \resizebox{\textwidth}{!}{%
+            \begin{tabular}{ccccccccccc}
+
+            \hline
+            % \rowcolor{gray!10}
+            \multirow{2}{*}{\emph{Buffer} (kB)} & \emph{Baseline} & \multicolumn{2}{c}{Skenario 1} & \multicolumn{2}{c}{Skenario 2} \\
+            \cline{2-6}
+            % \rowcolor{gray!10}
+            & \emph{Runtime} (detik) & \emph{Runtime} (detik) & \emph{Speedup} & \emph{Runtime} (detik) & \emph{Speedup} \\
+            \hline
+
+            128 & 94.632 & 450.629 & 0.21 & 29.207 & 3.4 \\
+
+            512 & 92.656 & 463.281 & 0.2 & 39.321 & 3.16 \\
+
+            1024 & 90.118 & 500.656 & 0.18 & 31.29 & 2.88 \\
+
+            2048 & 96.097 & 436.805 & 0.22 & 31.302 & 3.07 \\
+            \hline
+
+            \end{tabular}}
+        \end{center}
+    \end{table}
+\end{frame}
+
+\begin{frame}{Hasil Pengujian (bagian 2)}
+    \begin {table}[h]   
+        \begin{center}
+            \resizebox{\textwidth}{!}{%
+            \begin{tabular}{ccccccccccc}
+
+            \hline
+            % \rowcolor{gray!10}
+            \multirow{2}{*}{\emph{Buffer} (kB)} & \emph{Baseline} & \multicolumn{2}{c}{Skenario 3} & \multicolumn{2}{c}{Skenario 4} \\
+            \cline{2-6}
+            % \rowcolor{gray!10}
+            & \emph{Runtime} (detik) & \emph{Runtime} (detik) & \emph{Speedup} & \emph{Runtime} (detik) & \emph{Speedup} \\
+            \hline
+
+            128 & 94.632 & 31.44 & 3.01 & 30.825 & 3.07 \\
+
+            512 & 92.656 & 38.446 & 2.41 & 29.137 & 3.18 \\
+
+            1024 & 90.118 & 35.202 & 2.56 & 22.417 & 4.02 \\
+
+            2048 & 96.097 & 31.404 & 3.06 & 20.446 & 4.7 \\
+            \hline
+
+            \end{tabular}}
+        \end{center}
+    \end{table}
+\end{frame}
+
+\begin{frame}{Analisis}
+    \begin{itemize}
+        \item Skenario 1 sangat lambat karena seringnya akses ke \emph{global memory}
+        \item Penggunaan \emph{shared memory} pada skenario 2 mengurangi akses ke \emph{global memory}
+        \item Skenario 3 cenderung melambat dibandingkan skenario 2 karena \emph{overhead} alokasi \emph{pinned memory}
+        \item Efektivitas \emph{cache} milik \emph{texture memory} pada skenario 4 selaras dengan besar \emph{buffer}
+    \end{itemize}
+\end{frame}
 
 \section{Kesimpulan}
 
-\begin{frame}{Summary}
+\begin{frame}{Kesimpulan}
 
-    Get the source of this theme and the demo presentation from
-
-    \begin{center}\url{github.com/matze/mtheme}\end{center}
-
-    The theme \emph{itself} is licensed under a
-    \href{http://creativecommons.org/licenses/by-sa/4.0/}{Creative Commons
-    Attribution-ShareAlike 4.0 International License}.
-
-    \begin{center}\ccbysa\end{center}
+    \begin{enumerate}
+        \item Penggunaan GPU mampu meningkatkan kinerja hingga 3-4 kali lipat
+        \item Implementasi menggunakan algoritma Aho-Corasick tanpa \emph{failuress} dengan memanfaatkan \emph{thread} GPU
+        \item Digunakan beberapa teknik untuk mengurangi latensi akibat akses ke \emph{global memory}
+    \end{enumerate}
 
 \end{frame}
 
@@ -336,23 +405,5 @@
 \end{frame}
 
 \appendix
-
-% \begin{frame}[fragile]{Backup slides}
-%     Sometimes, it is useful to add slides at the end of your presentation to
-%     refer to during audience questions.
-
-%     The best way to do this is to include the \verb|appendixnumberbeamer|
-%     package in your preamble and call \verb|\appendix| before your backup slides.
-
-%     \themename will automatically turn off slide numbering and progress bars for
-%     slides in the appendix.
-% \end{frame}
-
-% \begin{frame}[allowframebreaks]{References}
-
-%     \bibliography{demo}
-%     \bibliographystyle{abbrv}
-
-% \end{frame}
 
 \end{document}
