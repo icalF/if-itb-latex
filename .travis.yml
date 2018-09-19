@@ -12,4 +12,8 @@ install:
     - pdflatex --version
 
 script:
-    - make
+    - cd src
+    - pdflatex thesis
+    - bibtex thesis
+    - pdflatex thesis
+    - pdflatex thesis
