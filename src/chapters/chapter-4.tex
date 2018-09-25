@@ -6,7 +6,7 @@ Pembahasan pada bab ini akan dibagi menjadi dua bagian. Bagian pertama dipaparka
 
 \section{Implementasi}
 
-  Bagian implementasi dibagi menjadi 4 bagian. Bagian pertama dibahas mengenai lingkungan implementasi. Bagian kedua dibahas mengenai batasan implementasi. Bagian ketiga dibahas mengenai spesifikasi modul. Bagian terakhir berisi konfigurasi sistem deteksi intrusi.
+  Bagian implementasi dibagi menjadi tiga bagian. Bagian pertama dibahas mengenai lingkungan implementasi. Bagian kedua dibahas mengenai batasan implementasi. Bagian terakhir dibahas mengenai spesifikasi komponen.
 
   \subsection{Lingkungan Implementasi}
 
@@ -32,29 +32,39 @@ Pembahasan pada bab ini akan dibagi menjadi dua bagian. Bagian pertama dipaparka
 
   \subsection{Spesifikasi Komponen}
 
-    Implementasi dilakukan dengan membuat beberapa komponen, yaitu:
+    Berdasarkan analisis pada Bab III, implementasi akan berbasis implementasi \cite{lin2013} dengan skema \emph{pinned memory buffer} seperti pada \cite{gnort2008}. Implementasi dilakukan dengan membuat beberapa komponen, yaitu:
 
     \begin{enumerate}
 
       \item
       \emph{Handle} \\
-      \emph{Handle} merupakan struktur data yang membungkus fungsionalitas pencocokan untuk dapat digunakan pada \emph{pipeline} Snort. \emph{Handle} berisi fungsi-fungsi yang terkait modul yang dikembangkan seperti menambahkan pola, pembentukan kamus, pencarian, dan mencetak informasi spesifik \emph{handle}. Fungsi-fungsi pada \emph{handle} akan memanggil modul lain yang terkait, misalnya fungsi pembentukan kamus akan memanggil komponen pembentukan kamus pada kode PFAC yang dibuat.
+      \emph{Handle} merupakan struktur data yang membungkus fungsionalitas pencocokan untuk dapat digunakan pada \emph{pipeline} Snort. \emph{Handle} berisi daftar pola, \emph{buffer} masukan, tabel transisi (sisi \emph{host} maupun \emph{device}), jumlah \emph{state} akhir dan \emph{list} hasil pencocokan. \emph{Buffer} masukan hanya dialokasi sekali sebesar 256 MB
+      
+      \emph{Handle} juga berisi fungsi-fungsi yang terkait modul yang dikembangkan seperti menambahkan pola, pembentukan kamus, pencocokan, dan mencetak informasi spesifik \emph{handle}. Fungsi-fungsi pada \emph{handle} akan memanggil modul lain yang terkait, misalnya fungsi pembentukan kamus akan memanggil komponen pembentukan kamus pada kode PFAC yang dibuat.      
 
       \item
-      \emph{State machine} \\
-      \emph{State machine} merupakan kamus yang digunakan dalam pencocokan. \emph{State machine} dibentuk di memori \emph{host}. Pola yang telah dikumpulkan dalam \emph{list}, akan disusun ulang sehingga terurut secara alfabetis. Kemudian akan dilakukan penelusuran DFS (\emph{depth-first search}) untuk membangun transisi tiap \emph{state}.
+      \emph{State machine builder} \\
+      \emph{State machine builder} merupakan modul yang digunakan membentuk kamus untuk pencocokan. \emph{State machine} dibentuk di memori \emph{host}. Pola dikumpulkan dahulu dalam sebuah \emph{list}. Kemudian tiap pola akan dilakukan penelusuran DFS (\emph{depth-first search}) untuk membangun transisi tiap \emph{state}. 
+      
+      Dalam penelusuran, simpul baru akan terbentuk ketika simpul hasil transisi karakter tidak terdefinisi (bernilai \emph{null}). Untuk mengurangi \emph{lookup} ke \emph{global memory}, \emph{final state} tidak disebutkan secara eksplisit. Melainkan, dengan mengubah susunan nomor \emph{state} sehingga \emph{state} akhir berada pada nomor awal. Sehingga pengecekan hanya tinggal membandingkan nomor \emph{state} dengan jumlah \emph{state} akhir.
 
       \item
-      \emph{Kernel wrapper} \\
-      \emph{Kernel wrapper} adalah \emph{wrapper} yang menyiapkan \emph{payload} sebelum \emph{kernel} dijalankan. \emph{Wrapper} akan menyalin \emph{payload} dari \emph{host buffer} ke \emph{device buffer}. Setelah persiapan selesai, \emph{wrapper} akan memanggil kode \emph{kernel} untuk menjalankan pencocokan.
+      \emph{Matcher wrapper} \\
+      \emph{Matcher wrapper} adalah \emph{wrapper} dari \emph{kernel} sebelum dijalankan. \emph{Wrapper} akan menyiapkan \emph{payload} masukan sebelum \emph{kernel} dijalankan. Masukan disalin dari \emph{host buffer} ke \emph{device buffer}. Setelah persiapan selesai, \emph{wrapper} akan memanggil kode \emph{kernel} untuk menjalankan pencocokan. Setelah pencocokan selesai dilakukan, \emph{wrapper} akan menyalin \emph{array} hasil dari \emph{device} ke \emph{host}. \emph{Array} hasil tadi akan dikirim ke \emph{reducer} untuk digabungkan.
       
       \item
-      \emph{Matcher kernel} \\
-      \emph{Kernel} adalah kode GPU yang akan dijalankan untuk pencocokan. \emph{Kernel} hanya akan melakukan \emph{looping} terhadap nomor \emph{state} berdasarkan tabel transisi yang telah dimuat. \emph{Looping} akan berhenti ketika \emph{state} telah menuju \emph{state} akhir maupun status \emph{dummy}.
+      \emph{Kernel code} \\
+      \emph{Kernel} adalah kode GPU yang akan dijalankan untuk pencocokan. \emph{Kernel} hanya akan melakukan \emph{looping} terhadap nomor \emph{state} berdasarkan tabel transisi yang telah dimuat. \emph{Looping} akan berhenti ketika \emph{state} telah menuju \emph{state} akhir maupun status \emph{dummy}. Kemudian \emph{state} akhir akan ditulis ke \emph{output array}. \emph{Buffer} akan dibagi menjadi 4 bagian sebagai titik mulai pencocokan. Sehingga tiap \emph{thread} akan mencocokkan sebanyak 4 kali. \emph{Pseudocode} dari kode \emph{kernel} akan terlihat seperti pada Gambar IV.1 berikut.
+
+      \begin{figure}[htb]
+        \centering
+        \includegraphics[width=0.65\textwidth]{resources/pseudo.png}
+        \caption[\emph{Pseudocoode kernel}]{\emph{Pseudocoode kernel}}
+      \end{figure}
 
       \item
       \emph{Reducer} \\
-      \emph{Reducer} akan menggabungkan hasil pencocokan dari tiap \emph{thread} sehingga diperoleh jumlah total rule yang terdeteksi. \emph{Reducer} dipanggil setelah \emph{matcher} dijalankan. \emph{Reducing} akan dilakukan secara sekuensial pada CPU. Hasil \emph{reducing} akan dikembalikan ke fungsi \emph{search} milik \emph{handle} untuk dikembalikan lagi ke Snort.
+      \emph{Reducer} akan menggabungkan hasil pencocokan dari tiap \emph{thread} sehingga diperoleh total kumpulan pola yang terdeteksi. \emph{Reducer} dipanggil setelah \emph{matcher} dijalankan. \emph{Reducing} akan dilakukan secara sekuensial pada CPU. Hasil \emph{reducing} akan dikembalikan ke fungsi \emph{search} milik \emph{handle} untuk dikembalikan lagi ke Snort dalam bentuk jumlah.
       
     \end{enumerate}
 
@@ -72,7 +82,7 @@ Pembahasan pada bab ini akan dibagi menjadi dua bagian. Bagian pertama dipaparka
 \section{Pengujian}
 
   \subsection{Tujuan Pengujian}
-    Pengujian dilakukan untuk mendapatkan perbandingan kinerja antara modul yang dikembangkan dan modul yang ada dalam NIDS Snort. 
+    Pengujian dilakukan untuk mendapatkan perbandingan kinerja antara modul yang dikembangkan dan modul yang ada dalam NIDS Snort. Pengujian dibatasi dengan menggunakan konfigurasi \emph{data acquisition} PCAP dengan masukan \emph{file} tcpdump saja. \emph{Live testing} tidak diujikan dalam Tugas Akhir ini mengingat kapasitas \emph{network interface} dapat menjadi \emph{bottleneck} sehingga hasil perbandingan tidak akurat.
 
   \subsection{Skenario Pengujian}
   
@@ -97,7 +107,13 @@ Pembahasan pada bab ini akan dibagi menjadi dua bagian. Bagian pertama dipaparka
 
     \end{enumerate}
 
-    Kelima skenario akan diuji dengan ukuran \emph{buffer} berbeda.
+    Kelima skenario akan diuji dengan ukuran \emph{buffer} berbeda, yaitu 128 kB (bawaan), 512 kB, 1024 kB, dan 2018 kB.
+
+  \subsection{Lingkungan Pengujian}
+
+    Pengujian dilakukan pada komputer dengan spesifikasi seperti pada Tabel IV.2 berikut.
+    
+    \input{tables/test-specs.tex}
 
   \subsection{Hasil Pengujian}
 
@@ -107,10 +123,10 @@ Pembahasan pada bab ini akan dibagi menjadi dua bagian. Bagian pertama dipaparka
 
   \subsection{Analisis Hasil Pengujian}
     
-    Dari hasil pengujian, didapatkan bahwa hasil skenario 1 memilki kapasitas paling rendah. Alasannya yaitu karena operasi pencocokan sering melakukan \emph{fetch} ke \emph{global memory}. 
+    Dari hasil pengujian, didapatkan bahwa hasil skenario 1 memilki kapasitas paling rendah. Alasannya yaitu karena operasi pencocokan \emph{string} adalah operasi yang \emph{memory-bound}. Diperlukan banyak akses ke penyimpanan kamus untuk mendapatkan transisi ke \emph{next state}. Karena kamus disimpan di \emph{global memory}, maka \emph{fetch} ke \emph{global memory} menjadi sering dan menimbulkan latensi yang cukup besar.
     
-    Skenario 2 secara umum lebih cepat beberapa kali daripada skenario 1. Sekitar ? hingga ? kali lipat lebih cepat. Karena latensi antara \emph{global memory} dan \emph{shared memory} terpaut jauh sehingga mengakibatkan kapasitas meningkat.
+    Skenario 2 secara umum lebih cepat beberapa kali daripada skenario 1, yaitu sekitar 15 kali lipat lebih cepat. Hal ini karena kecepatan akses \emph{global memory} lebih besar dari \emph{shared memory}. Dalam skenario ini, \emph{input string} seharusnya tidak berpengaruh banyak karena adanya \emph{coalescing access}. Sehingga pemuatan baris transisi dari \emph{state} awal ke \emph{shared memory} memiliki pengaruh yang besar terhadap \emph{throughput} sistem. Ini menunjukkan bahwa mayoritas \emph{thread} akan berhenti pada awal pencocokan.
 
-    Skenario 3 tidak terlalu berpengaruh terhadap skenario 2. Keuntungan \emph{pinned memory} tidak terlalu terlihat bahkan cenderung memperlambat. Sejalan dengan eksperimen yang dilakukan \cite{gnort2008}, \emph{pinned memory} memiliki \emph{overhead} saat alokasi dan dealokasi.
+    Skenario 3 tidak terlalu berpengaruh terhadap skenario 2. Keuntungan \emph{pinned memory} tidak terlalu terlihat bahkan cenderung memperlambat. Sejalan dengan eksperimen yang dilakukan \cite{gnort2008}. Ini karena \emph{pinned memory} memiliki \emph{overhead} saat alokasi dan dealokasi. Kemungkinan besar ini terjadi karena ukuran \emph{buffer} belum terlalu besar. \emph{Overhead} saat alokasi masih belum sebanding dengan perbedaan \emph{transfer} antara DMA dan melalui CPU. Selain itu, juga tidak terjadi \emph{swap} terhadap \emph{page} yang terdapat \emph{buffer} karena ukuran memori masih kecil.
 
-    Sedangkan skenario 4 baru terlihat perbedaan signifikan terhadap skenario 2 dan 3 pada \emph{buffer} sebesar 1 MB ke atas. Adanya \emph{cache} pada memori tekstur membantu menurunkan akses ke memori global dan meningkatkan kinerja keseluruhan modul.
+    Sedangkan skenario 4 baru terlihat perbedaan signifikan terhadap skenario 2 dan 3 pada \emph{buffer} sebesar 1 MB ke atas. Terlihat bahwa adanya \emph{cache} pada memori tekstur membantu menurunkan akses ke memori global dan meningkatkan kinerja keseluruhan modul. 

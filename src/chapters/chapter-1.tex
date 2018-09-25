@@ -16,33 +16,35 @@
 
   Karena adanya peningkatan kecepatan \emph{traffic} internet dan banyaknya serangan yang terjadi, maka dibutuhkan NIDS yang mampu melakukan deteksi dengan lebih cepat. Salah satu \emph{bottleneck} dalam pengecekan paket adalah banyaknya \emph{rule} yang harus dicocokkan \citep{pcre2007}. Sehingga, peningkatan secara signifikan dapat dicapai salah satunya dengan meningkatkan kemampuan komputasi untuk pencocokan banyak paket secara paralel. Pemanfaatan \emph{multithreading} pada \emph{multicore processor} telah dikembangkan untuk mempercepat kinerja NIDS \citep{multi2004}.
 
-  Selain mengoptimalkan penggunaan CPU, alternatif yang dapat digunakan yaitu penggunaan \emph{general purpose} GPU (GPGPU) \citep{4482891}. Dapat juga menggunakan prosesor yang mudah dikustomisasi seperti ASIC atau FPGA \citep{fpga2008}. GPGPU banyak digunakan karena perangkat yang mudah didapatkan, multiguna, dan hanya membutuhkan lebih sedikit kustomisasi daripada ASIC dan FPGA. Selain itu, perbandingan kinerja antara GPGPU dan ASIC atau FPGA tidak terlalu jauh tanpa melakukan kustomisasi lebih lanjut di tingkat \emph{low level} \citep{gnort2008}. Maka, Tugas Akhir ini akan fokus untuk melakukan pembangunan NIDS yang berbasis GPGPU.
+  Selain mengoptimalkan penggunaan CPU, alternatif yang dapat digunakan yaitu penggunaan \emph{general purpose} GPU (GPGPU) \citep{4482891}. Dapat juga menggunakan prosesor yang mudah dikustomisasi seperti ASIC atau FPGA \citep{fpga2008}. GPGPU banyak digunakan karena perangkat yang mudah didapatkan, multiguna, dan hanya membutuhkan lebih sedikit kustomisasi daripada ASIC dan FPGA. Selain itu, perbandingan kinerja antara GPGPU dan ASIC atau FPGA tidak terlalu jauh tanpa melakukan kustomisasi lebih lanjut di tingkat \emph{low level} \citep{gnort2008}. Maka, Tugas Akhir ini akan fokus untuk melakukan eksperimen terhadap metode pencocokan \emph{string} pada NIDS yang berbasis GPGPU.
 
 \section{Rumusan Masalah}
 
-  Melakukan pencocokan pola secara paralel memiliki beberapa masalah yaitu algoritma yang digunakan, penyimpanan \emph{dictionary}, dan metode \emph{streaming} paket. Dan juga hasil yang diharapkan dapat menangani kasus dengan kapasitas aliran data yang besar. Maka dari itu, Tugas Akhir ini akan difokuskan pada pembangunan sistem deteksi intrusi jaringan paralel dengan GPU. Dalam rangka pembangunan sistem tersebut, terdapat beberapa permasalahan yang menjadi fokus perhatian dari penelitian ini, yaitu: 
+  Melakukan pencocokan pola secara paralel memiliki beberapa masalah yaitu algoritma yang digunakan, penyimpanan \emph{dictionary}, dan metode \emph{streaming} paket. Dan juga hasil yang diharapkan dapat menangani kasus dengan kapasitas aliran data yang besar. Maka dari itu, Tugas Akhir ini akan difokuskan pada eksperimen terhadap komponen pencocokan \emph{string} paralel pada NIDS dengan GPU. Dalam rangka eksperimen tersebut, terdapat beberapa permasalahan yang menjadi fokus perhatian dari penelitian ini, yaitu: 
 
   \begin{enumerate}
-      \item Bagaimana implementasi pencocokan pola dengan GPU pada IDS Snort?
-      \item Bagaimana kinerja sistem deteksi intrusi jaringan akibat dari penggunaan GPU?
+      \item Bagaimana implementasi algoritma pencocokan pola dengan GPU pada NIDS Snort?
+      \item Bagaimana optimasi yang digunakan untuk mengurangi latensi akibat penggunaan GPU?
+      \item Bagaimana kinerja modul pencocokan dibandingkan implementasi pada NIDS Snort?
   \end{enumerate}
 
 \section{Tujuan}
 
   Tujuan dari pelaksanaan Tugas Akhir ini adalah sebagai berikut:
   \begin{enumerate}
-      \item Mengembangkan modul pencocokan pola dengan GPU yang terintegrasi dengan Snort IDS
-      \item Melakukan perbandingan kinerja sistem deteksi intrusi jaringan sebelum dan setelah menggunakan GPU
+      \item Mengembangkan modul pencocokan pola dengan GPU yang dapat terintegrasi dengan Snort IDS
+      \item Melakukan optimasi pada struktur memori yang digunakan pada GPU
+      \item Melakukan perbandingan kinerja modul pencocokan sebelum dan setelah menggunakan GPU
   \end{enumerate}
 
 \section{Batasan Masalah}
 
-  Merancang NIDS yang cepat dengan menggunakan GPU merupakan solusi yang cocok untuk menghadapi serangan yang semakin meningkat. Tugas Akhir ini akan difokuskan pada pembangunan sistem yang melakukan inspeksi paket secara cepat menggunakan komputasi paralel pada GPU. Dalam rangka pembangunan sistem tersebut, terdapat beberapa batasan yang digunakan dalam penelitian ini, yaitu:
+  Merancang modul pencocokan string dengan menggunakan GPU diharapkan dapat mempercepat NIDS Snort. Dalam rangka pembangunan modul tersebut, terdapat beberapa batasan yang digunakan dalam penelitian ini, yaitu:
   \begin{enumerate}
-      \item NIDS dibuat di atas NIDS Snort
-      \item NIDS menggunakan \emph{platform} GPGPU CUDA
-      \item \emph{Payload} akan diambil dari \emph{log} jaringan berupa berkas PCAP
-      \item NIDS menggunakan \emph{rule} milik Snort VRT yang disesuaikan
+      \item Modul pencocokan akan mengimplementasi \emph{interface} MPSE \emph{multi-pattern search engine} milik Snort
+      \item Modul dikembangkan menggunakan \emph{platform} GPGPU CUDA
+      \item Masukan disuplai akan diambil dari \emph{traffic log} jaringan berupa berkas PCAP
+      \item Pola didapat dari \emph{rule} milik Snort VRT yang disesuaikan
   \end{enumerate}
 
 \section{Metodologi}
@@ -51,16 +53,16 @@
   \begin{enumerate}
 
       \item Analisis Permasalahan \\
-      Pengerjaan Tugas Akhir ini diawali dengan analisis terhadap permasalahan yang ingin diteliti lebih lanjut. Pada tahap ini, studi literatur perlu dilakukan dalam rangka mempelajari hasil-hasil penelitian terkait yang telah dilakukan, berikut metodologi penelitian serta ketercapaian yang berhasil didapatkan. Selain itu, tahap ini juga menjadi langkah awal untuk merumuskan landasan teori, penarikan hipotesis, hingga akhirnya dicapai rancangan solusi yang akan digunakan untuk membangun sistem deteksi intrusi.
+      Pengerjaan Tugas Akhir ini diawali dengan analisis terhadap permasalahan yang ingin diteliti lebih lanjut. Pada tahap ini, studi literatur perlu dilakukan dalam rangka mempelajari hasil-hasil penelitian terkait yang telah dilakukan, berikut metodologi penelitian serta ketercapaian yang berhasil didapatkan. Selain itu, tahap ini juga menjadi langkah awal untuk merumuskan landasan teori, penarikan hipotesis, hingga akhirnya dicapai rancangan solusi yang akan digunakan untuk membangun modul pencocokan.
 
       \item Analisis Metode \\
       Pada tahap analisis metode, dilakukan eksplorasi yang bertujuan untuk mendapatkan metode-metode terbaik yang dapat digunakan sebagai komponen dalam pencocokan \emph{signature}. Analisis yang dilakukan mencakup memori \emph{layout} untuk \emph{dictionary}, dan algoritma pencocokan \emph{signature}. Selain dilakukan eksperimen secara umum dengan mengacu pada penelitian-penelitian serupa yang pernah dilakukan sebelumnya, akan dilakukan pula eksperimen dengan beberapa modifikasi yang dianggap perlu.
 
-      \item Implementasi Sistem \\
-      Pembangunan sistem deteksi intrusi dilakukan dengan memanfaatkan hasil yang didapatkan dari tahapan sebelumnya, yakni metode-metode dan algoritma pencocokan pola.
+      \item Implementasi Modul \\
+      Pembangunan modul pencocokan dilakukan dengan memanfaatkan hasil yang didapatkan dari tahapan sebelumnya, yakni metode-metode dan algoritma pencocokan pola.
 
       \item Evaluasi dan Penarikan Kesimpulan \\
-      Pada tahap ini dilakukan evaluasi terhadap sistem deteksi intrusi yang telah dibangun. Selain itu, dilakukan juga penarikan kesimpulan yang didasari oleh hasil evaluasi pengujian sistem deteksi intrusi.
+      Pada tahap ini dilakukan evaluasi terhadap modul yang telah dibangun. Selain itu, dilakukan juga penarikan kesimpulan yang didasari oleh hasil evaluasi pengujian modul.
 
   \end{enumerate}
 

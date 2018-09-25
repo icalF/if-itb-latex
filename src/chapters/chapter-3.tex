@@ -2,25 +2,21 @@
 
 \chapter{Analisis Permasalahan dan Solusi}
 
-  % Pada bab ini akan dipaparkan analisis berdasarkan studi literatur pada bab sebelumnya terkait pembangunan sistem pencegahan intrusi berbasis GPU. Selain itu, akan dipaparkan juga solusi yang diajukan untuk mesin yang akan dibuat.
-
   \section{Analisis Permasalahan}
-  
-    % Sistem pencegah intrusi jaringan (NIPS) adalah sistem yang bertugas melakukan penyaringan paket yang dianggap berbahaya. NIPS bekerja dengan cara menangkap paket yang berjalan dalam jaringan untuk kemudian dianalisis. Hasil analisis kemudian ditindaklanjuti berdasarkan \emph{rule} yang telah didefinisikan. Paket dapat ditolak, dibatasi atau bahkan diblok.
-
-    % Analisis paket dapat dilakukan dengan bermacam-macam metode asd
 
     Dampak dari pengecekan paket adalah adanya \emph{overhead} waktu respons. Lama \emph{overhead} tergantung dari waktu pencocokan pola. Pada sistem pencegah intrusi jaringan (NIPS), hal ini dapat membuat hasil analisis menjadi tidak akurat. Maka perlu adanya metode untuk mempercepat proses analisis. Sebagai perbandingan, \emph{bandwidth} jaringan US Naval Postgraduate School sudah mencapai 20 Gbps dengan traffic rata-rata sebesar 200 Mbps per hari. Sedangkan maksimum paket yang dapat dianalisis secara serial oleh Snort tidak lebih besar dari 300 Mbps \citep{albin2012}.
 
     Beberapa penelitian tentang teknik mempercepat NIDS dan NIPS telah dilakukan. Desain paling awal yaitu menggunakan desain konkuren dengan \emph{multithreading} pada CPU \citep{multi2004}. Desain ini mampu meningkatkan penggunaan utilitas \emph{thread} CPU secara drastis. Kemudian desain berbeda yang menggunakan GPU mulai diajukan oleh \cite{gnort2008}. Hasil yang didapat mampu mempercepat sistem hingga 5x dibandingkan CPU dengan harga yang sepadan \citep{smith2009}.
 
-    % Pencocokan dapat dilakukan secara stateful, ataupun tidak. Pencocokan yang berbasis stateful akan lebih susah untuk dicek secara paralel.
+    Berdasarkan pengukuran yang dilakukan oleh \cite{kargus2012}, didapatkan bahwa sebagian besar beban analisa paket berada pada tahap pencarian string pada \emph{payload} paket. Pada tahapan ini, sebagian besar paket yang tidak terindikasi sebagai serangan akan diloloskan. Sehingga beban pencocokan pada tahap berikutnya, yaitu pencocokan \emph{option rule} akan berkurang drastis. Maka, fokus dari solusi yang akan diajukan yaitu implementasi desain yang akan mempercepat kinerja pencocokan \emph{string} paket pada NIDS Snort menggunakan GPU. 
 
-    %Meski demikian, masih ada beberapa masalah terjadi dalam desain yang telah diajukan. Pencocokan paket masih menggunakan algoritma yang berbasis backtracking sehingga banyak operasi sinkronisasi yang menghambat laju pencocokan dengan multithread.  Selain itu, opsi pada rule seringkali tidak dapat dicocokkan dengan sekali asd
-
-    Berdasarkan pengukuran yang dilakukan oleh \cite{kargus2012}, didapatkan bahwa sebagian besar beban analisa paket berada pada tahap pencarian string pada \emph{payload} paket. Pada tahapan ini, sebagian besar paket yang tidak terindikasi sebagai serangan akan diloloskan. Sehingga beban pencocokan pada tahap berikutnya, yaitu pencocokan \emph{option rule} akan berkurang drastis. Maka, fokus dari solusi yang akan diajukan yaitu implementasi desain yang akan mempercepat kinerja pencocokan string paket pada NIDS Snort. 
+    Sampai saat ini ada beberapa penelitian terkait pencocokan \emph{string} menggunakan GPU. \cite{gnort2008} merancang sebuah arsitektur untuk mengakomodasi algoritma Aho-Corasick pada GPU. Implementasi dilakukan pada NIDS Snort. 
     
-    Implementasi yang diajukan akan menggunakan metode dari \cite{lin2013} serta sedikit modifikasi dari \cite{gnort2008}. \cite{lin2013} mengajukan pendekatan berbeda dalam implementasi algoritma Aho-Corasick untuk pencocokan paralel pada GPU. Selain itu, dilakukan pula beberapa teknik untuk mengurangi latensi sistem secara keseluruhan. 
+    Implementasi \emph{state machine} menggunakan tabel 2D untuk memaksimalkan \emph{locality} dan skema transfer antara \emph{host} dan \emph{device} menggunakan \emph{doublle buffering}. Sedangkan \emph{buffer} juga dialokasi dengan \emph{pinned memory}. Desain ini meningkatkan \emph{throughput} rata-rata sistem sebesar 3 kali lipat.
+
+    Kemudian, \cite{kargus2012} mengajukan solusi untuk mengurangi ketergantungan antar komponen dengan menggunakan \emph{pipelining}. \emph{Thread} untuk operasi analisis dipisahkan dengan \emph{thread} untuk operasi \emph{I/O}. Menggunakan solusi ini \emph{throughput} rata-rata sistem meningkat hingga 4 kali lipat.
+
+    Sedangkan \cite{lin2013} menemukan bahwa selain \emph{I/O}, sumber latensi berikutnya yaitu akses memori. Operasi pencocokan \emph{string} merupakan operasi yang \emph{memory-bound}. Rancangan sebelumnya menyimpan keseluruhan kamus pada memori global. Hal ini diatas dengan penggunaan \emph{shared memory} secara efektif dan kombinasi dengan \emph{texture memory}. Selain itu, terdapat modifikasi pada implementasi Aho-Corasick yang memaksimalkan penggunaan \emph{thread} pada GPU. Hasil eksperimen menunjukkan peningkatan \emph{throughput} hingga sebesar 10 kali lipat.
 
   \section{Analisis Solusi}
 
@@ -133,9 +129,11 @@
 
       \item
       Penelusuran automata \\
-      Pencocokan dilakukan dengan penelusuran mesin PFAC yang sudah dibentuk. \emph{Stream} masukan akan dimuat pada \emph{shared memory}. Tiap \emph{thread} akan memulai pencocokan pada satu karakter pada \emph{stream} masukan. Satu \emph{thread} melakukan pencocokan sebanyak 4 kali untuk mengurangi kemungkinan ketimpangan beban \citep{lin2013}. Penelusuran dilakukan hingga mencapai state akhir. Jika state akhir bukan merupakan state dummy, maka hasil pencocokan akan diset pada tabel hasil yang berada di \emph{global memory}.
+      Pencocokan dilakukan dengan penelusuran mesin PFAC yang sudah dibentuk. \emph{Stream} masukan akan dimuat pada \emph{shared memory}. Tiap \emph{thread} akan memulai pencocokan pada satu karakter pada \emph{stream} masukan. Satu \emph{thread} melakukan pencocokan sebanyak 4 kali untuk mengurangi kemungkinan ketimpangan beban \citep{lin2013}. Penelusuran dilakukan hingga mencapai state akhir. Jika state akhir bukan merupakan \emph{state dummy}, maka hasil pencocokan akan diset pada tabel hasil yang berada di \emph{global memory}.
 
       \end{enumerate}
+
+      Masing-masing akan dilakukan 
 
     \subsection{Kebutuhan Perangkat Lunak}
 
@@ -158,8 +156,8 @@
       \begin{enumerate}
 
         \item 
-        \emph{Pattern builder} \\
-        \emph{Pattern builder} melakukan pembangkitan kamus dari \emph{ruleset}. Pola akan ditambahkan dalam bentuk \emph{list of string} untuk kemudian ditampung dalam \emph{temporary table}. Kemudian \emph{temporary table} akan diiterasi untuk membentuk kamus. Kamus yang dibentuk menggunakan struktur tabel 2D dengan baris sebagai \emph{state} dan kolom sebagai status transisi. Setiap baris memiliki kolom sebesar 256 \emph{byte}.
+        \emph{State machine builder} \\
+        \emph{State machine builder} melakukan pembangkitan kamus dari \emph{ruleset}. Pola akan ditambahkan dalam bentuk \emph{list of string} untuk kemudian ditampung dalam \emph{temporary table}. Kemudian \emph{temporary table} akan diiterasi untuk membentuk kamus. Kamus yang dibentuk menggunakan struktur tabel 2D dengan baris sebagai \emph{state} dan kolom sebagai status transisi. Setiap baris memiliki kolom sebesar 256 \emph{byte}.
 
         \item
         \emph{Matcher} \\
