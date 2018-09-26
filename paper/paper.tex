@@ -35,8 +35,6 @@ imam@informatika.org}
 \maketitle
 
 \begin{abstract}
-    % The advancement of technology has been giving contributions to the rapid growth of the use of digital data. In this digital era, lots of physical data have been transformed into the digital ones. One example of the use of digital data is the digital biometric fingerprint data on the Electronic Identity Card (KTPel). Fingerprint matching can take a long time to process if the data is large enough. Thus, there is a need for a parallel fingerprint matching.  Based on this rationale, this paper aims to improve the fingerprint matching performance, in the current state of the art linear solution, by using the Minutia Cylinder-Code (MCC) algorithm in parallel on GPU. Based on the experiment and testing, the proposed solution has a significantly better run time compared to the state of the art linear solution while maintaining the accuracy. 
-
     The advancement of technology has been giving contributions to the rapid growth of the use of digital data. In this digital era, lots of physical data have been transformed into the digital ones. Among those, a lot of confidential data also take place. Thus, security assurance become important as well. One of the entry point of those malicious usages come from server side. Ensuring authority on server utilizing network intrusion detection system (NIDS) could take enormous resource and time. One of the important part of NIDS is string matching part inside the analyzer. Based on this rationale, this paper aims to improve matching speed of detection in order to maximize overall system throughput using GPU instead of CPU. Based on the experiment and testing, the proposed solution has a significantly better run time compared to the state of the art linear solution while maintaining the accuracy. 
 \end{abstract}
 
@@ -45,8 +43,15 @@ imam@informatika.org}
 \end{IEEEkeywords}
 
 \section{Introduction}
-This document is a model and instructions for \LaTeX.
-Please observe the conference page limits. 
+The advancement of technology has given contributions to the rapid growth of the use of digital data. In this digital era, lots of physical data have been transformed into the digital ones. One example of the use of digital data is the digital biometric fingerprint data on the Electronic Identity Card (KTP-el). 
+
+To identify a person, fingerprint matching can be used. There are some techniques to do fingerprint matching. One of popular technique is minutia-based fingerprint matching [1]. The technique can be classified into two categories, nearest neighbor-based and fixed radius-based. Each category has their own advantages and disadvantages. However, there is a technique that combines their advantages without having their drawbacks, i.e. Minutia Cylinder-Code (MCC). 
+
+Fingerprint matching is a problem, especially in a country that has a large population. According to Indonesian 2010 census, it was found that the total population of Indonesia was approximately 237.641.326 at that time [2]. In regard to this matter, the process of analyzing their fingerprints data could take extremely long time if it done linearly, which is what is currently happening. Thus, there is a need for a parallel fingerprint matching.
+
+Parallel processing can be done with multicore CPU, multicore GPU, or multicomputer. The difference between CPU and GPU is how they process task [3]. CPU only has several cores designed to process sequentially, while GPU has thousands of cores designed to do tasks in parallel.
+
+Based on previous statements, this paper aims to optimize fingerprint matching using Minutia Cylinder-Code with GPU. The optimization will be evaluated and the performance will be compared to the baseline.
 
 \section{String Matching}
 In general, there are two kinds of string matching: single pattern string matching and multi pattern string matching. We will focus into multi pattern string matching. There are several famous algorithms for multi pattern string matching: Aho-Corasick, Commentz-Walter, and Wu-Manber algorithm. This paper will try to implement variation of Aho-Corasick algorithm.
@@ -77,7 +82,7 @@ In general, there are two kinds of string matching: single pattern string matchi
 
     \subsection{Parallel Failureless Aho-Corasick}
     Another method to adapt multithreading Aho-Corasick is to spread threads to all characters byte. Each threads will matching any pattern begin with each coresponding character and terminate if any of final state or no valid transition occurs \cite{lin2013}. The consequence is eavery character will match only one pattern at most.
-    Thus, no need to make any failure function. And also boundary detection problem will not occur by using this approach.
+    Thus, no need to make any failure function. And also boundary detection problem will not occur by using this approach. This approach named as Parallel Failureless Aho-Corasick (PFAC).
 
     \begin{figure}[htbp]
         \centerline{\includegraphics[width=0.4\textwidth]{../src/resources/pfac.png}}
@@ -90,38 +95,65 @@ In general, there are two kinds of string matching: single pattern string matchi
     \subsection{Utilization of Double Buffering Scheme, Texture Memory and Pinned Memory}
 
         In this paper, GPU-based matching implementation had been proposed using Aho-Corasick algorithm. Beside utilization of GPU multithreading, there are few adjustment to import Aho-Corasick to GPGPU. State machine built using transition table on 2D table on texture memory. Based on experiment, this implementation improving performance by 19\% \cite{gnort2008}.
+        
         For the memory transfer scheme, double buffering scheme was proposed. Packets will be batched in one buffer. Whenever the buffer gets full, all packets are transferred to the GPU in one operation. Transfer from device to host also done in same way. All result will be batched in the second buffer and get transferred when gets full.
-        Another optimization trick used is using pinned memory. Both of the buffer in host will be pinned to reduce swappiness. And pinned memory also enable DMA transfer and reducing computation needs and latency. This design can improve system performance until 3.2 times higher than implementation using multithreading on CPU.
+        
+        Another optimization trick used is using pinned memory. Both of the buffer in host will be pinned to reduce swappiness. And pinned memory also enable DMA transfer and reducing computation needs and latency. This design could improve system performance until 3.2 times higher than implementation using multithreading on CPU.
 
-    \subsection{Maximizing GPU Utilization by Pipelining}
+    \subsection{Scalable Architecture for Maximizing GPU Utilization}
 
-        % Sehingga dalam penelitian ini, diajukan beberapa optimasi untuk pencocokan \emph{rule option}. Salah satu optimasi yang diajukan untuk tahap pencocokan yaitu penggunaan \emph{pipelining}. \emph{Pipelining} dilakukan dengan memisahkan \emph{thread} yang digunakan untuk operasi \emph{I/O} dengan operasi analisis. Kemudian pada tiap operasi \emph{I/O}, akan dilakukan pengumpulan paket dalam \emph{batch} sebelum dilakukan transfer antar komponen. Implementasi dilakukan dengan menggunakan basis IDS Snort.
-
-        % Pengujian dilakukan dengan konfigurasi CPU ganda Intel X5680 dengan 12 core dan dua GPU NVIDIA GTX 580. Hasil yang didapatkan menggunakan desain ini mampu mencapai 1,5 sampai 4 kali lipat kinerja Snort. \emph{Latency} dapat menurun hingga 13 mikrodetik pada \emph{offloading} paket awal untuk batch sebesar 1,5 kB. Pada pengujian dengan \emph{traffic} jaringan, rancangan ini mampu mencapai \emph{throughput} 25,2 Gbps pada \emph{input} sebesar 40 Gbps.
-
-        By profiling, it is concluded that bottleneck occured on 3 components: packet acquisition, multi pattern string matching, and option rule matching by regular expression. Moreover, inside string matching component alone, 
+        By profiling, it is concluded that bottleneck occured on 3 components: packet acquisition, multi pattern string matching, and option rule matching by regular expression. Moreover, inside string matching component alone, average utilization of GPU still low. This paper applied architectural improvement around NIDS. \textcolor{red}{Methods being proposed} are pipelining and payload batching. Pipelining used to separate thread using in transfer and matching. And by this architecture, NIDS can be scaled to multiple GPU and CPU core instances \cite{kargus2012}. 
+        
+        Improvement achieved by this method was about 1.5 until 4 times higher compared to Snort baseline. Evaluation performed using double CPU Intel X5680 with 12 core each and double GPU NVIDIA GTX 580. NIDS was run under network traffic with capacity around 40 Gbps and could reach throughput 25.2 Gbps.
 
     \subsection{Failureless Aho-Corasick by Maximizing Shared Memory Usage}
 
-        Salah-satu algoritma yang sering digunakan dalam deteksi pola adalah Aho-Corasick yang bersifat \emph{multi-pattern string matching}. Dalam penelitian yang dilakukan \cite{lin2013}, dilakukan optimasi pada implementasi algoritma Aho-Corasick pada GPU. Implementasi memanfaatkan fitur-fitur pada GPU seperti \emph{memory coalescing}, penghematan transaksi pada \emph{global memory}, dan akses \emph{shared memory} yang bebas \emph{bank-conflict}.
-
-        Desain akan menggunakan pendekatan algoritma AC tanpa \emph{failure function} yaitu PFAC (\emph{Parallel Failureless Aho-Corasick}). Pendekatan ini dapat memaksimalkan penggunaan \emph{thread} pada GPU tanpa menyebabkan \emph{overlapping}. Transaksi ke \emph{global memory} dapat dikurangi dengan memuat transisi \emph{state} kosong ke \emph{shared memory} dan penggunaan \emph{texture memory} yang memanfaatkan \emph{cache}.
-
-        Hasil pengujian dengan CPU Intel Core i7-950 dan GPU NVIDIA GTX 580 menunjukkan peningkatan yang signifikan. Optimasi dengan PFAC pada \emph{multithread} CPU mencapai 7 kali lipat dari AC. Sedangkan PFAC pada GPU dapat mencapai 10 kali lipat daripada AC pada CPU. Masukan didapatkan dari dataset \emph{traffic} kompetisi DEFCON.
+        One way to perform Aho-Corasick matching is by assigning each input byte to each threads simultanously. Then each threads will perform matching \textcolor{red}{begin} with assined byte. Matching stops whenever final state or invalid transition occurs. This approach need no failure function. So that each thread only responsible for matching at most one pattern \cite{lin2013}.
+        
+        This novel approach utilizing memory coalescing in GPU so sequential bytes can be loaded at once. To further improve performance, transition from beginning state will be loaded to shared memory to reduce transaction toward global memory. 
+        
+        For the transition table, we cannot ensure it will fit to the shared memory. So in alternative to shared memory, transition table will be bound to texture memory instead. Texture memory has several advantages. Texture memory has bigger cache and suitable to perform fetching with access pattern which are difficult to predict. Testing using PCAP dataset from DEFCON showed significant performance improvement. Using CPU Intel Core i7-950 and GPU NVIDIA GTX 580, system throughput could become 3 times compared to Snort baseline.
 
 \section{Proposed Solution}
     \subsection{Matching Algorithm}
+        In order to implement Aho-Corasick to GPU, we need to exploit SIMD (single instruction multiple data) optimally. Data parallel approach is one of the easiest approach to implement. After splitting chunks, each chunks assign to different threads with extension as long the longest pattern. This approach has 2 problem: the extension increasing data transaction drastically, and not optimal if input splitted to so many chunks. \textcolor{red}{GPU can spawn as hundreds threads and hopefully all threads can be utilized optimally.}
+
+        Alternative solution is by using PFAC. The idea of allocating an individual thread to each byte of an input stream has important implications on the efficiency of the PFAC state machine. First, each thread of PFAC is only responsible for identifying the pattern starting at the thread’s starting position. Therefore, whenever a thread cannot find any pattern located at its beginning position, it terminates immediately without taking failure transitions to backtrack the state machine. In other words, each thread of PFAC runs in the best time $O(1)$ and the worst time $O(m)$ where $m$ is the longest pattern length. Therefore, the failure transitions of the AC state machine are all removed as well as the self-loop transition of the initial state. An AC state machine with all its failure transitions and self-loop transition removed is called a PFAC machine. Fig. 4 shows the PFAC machine to identify the four patterns, “AB,” “ABG,” “BEDE,” and “ED.”
+
     \subsection{State Machine Implementation}
-    \subsection{\emph{Thread} Allocation}
+        There are 2 alternatives for state machine implementation: table 2d or linked tree. Structure of linked tree is too complex to be stored in GPU. And allocating memory in GPU is demandly thus this option is less preferable. 
+        Blablas blas about table
+
+    \begin{figure}[htbp]
+        \centerline{\includegraphics[width=0.4\textwidth]{../src/resources/table.png}}
+        \caption{Transition table representation}
+        \label{fig}
+    \end{figure}
+
+    \subsection{Thread Allocation}
+        Problem for using PFAC is load of each threads can be unbalanced (because of only few threads will survived)
+        Solution: repeating assignment
+
     \subsection{GPU Optimation}
+        Load input to shared
+        Load first row to shared
+        Bind to texture
+        Bind to pinned
+        Thread reduce bank conflict
 
 \section{Implementation on Snort}
     \subsection{MPSE Interface}
+        What provided? And how you implement those interface?
+
     \subsection{Modules}
+        Connect interface to your design
 
 \section{Evaluation}
     \subsection{Environment}
+        asd
+        
     \subsection{Performance Evaluation}
+        asd
 
 \section{Conclusion}
 
