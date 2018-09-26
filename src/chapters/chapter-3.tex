@@ -63,7 +63,7 @@
       %  Salah satu komponen yang paling penting dalam GPGPU adalah penyalinan data antar host dan device. Pengiriman dari host ke device maupun sebaliknya memiliki \emph{latency} yang cukup besar. Dalam pengujian pada \citep{gnort2008}, didapatkan bahwa \emph{latency} dari transfer payload memiliki runtime lebih dari 80\% runtime total. Sehingga untuk menyembunyikan \emph{latency}, pengujian akan menggunakan batch processing.      
       % pengiriman akan dilakukan per batch. Ukuran batch yang digunakan akan diuji dalam ukuran 32MB, 64MB, 128MB, dan 256MB.
       
-      \subsection{Struktur Penyimpanan Kamus}
+    \subsection{Struktur Penyimpanan Kamus}
       
       Implementasi dari mesin PFAC yang digunakan ada beberapa macam. Salah satu model yang dapat digunakan yaitu dengan bentuk seperti pohon dengan \emph{list of pointer} ke status anak. Namun, model yang dialokasi secara dinamis tidak cocok digunakan dalam GPU karena alokasi pada GPU memiliki latensi yang tinggi. Selain itu, lokasi memori dapat menjadi tidak kontigu dan tidak mendukung adanya \emph{spatial locality}.
       
@@ -79,7 +79,7 @@
 
       Penghematan memori lebih jauh dapat dilakukan dengan menerapkan skema kompresi tabel menjadi \emph{bitmap}. Namun, keuntungan dari penggunaan memori tekstur akan terhambat. Dibutuhkan komputasi tambahan untuk melakukan \emph{lookup fetch} dari memori tekstur. Sehingga teknik ini tidak digunakan pada rancangan modul.
 
-      \subsection{Alokasi \emph{Thread}}
+    \subsection{Alokasi \emph{Thread}}
 
       Seperti dijelaskan pada bagian III.2.1, \emph{thread} akan menelusuri \emph{state machine} yang sama dan berhenti ketika tidak ada transisi yang valid. Sehingga, banyak diantara \emph{thread} yang akan berhenti sangat awal. Untuk menunjang \emph{stream processor}, \cite{lin2013} mengusulkan alokasi memori yang berulang.
 

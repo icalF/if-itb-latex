@@ -115,80 +115,6 @@
       \item \emph{reference}, acuan dari \emph{vulnerability} yang mungkin
     \end{enumerate} 
 
-% \section{Komputasi Paralel}
-
-%   % \blindtext
-
-%   \subsection{Hukum Amdahl dan Hukum Gustafson}
-
-%     Secara optimal, speedup yang dicapai dengan paralelisasi akan tumbuh secara linier. Namun kenyataannya, paralesisasi terbatas dengan porsi sistem yang dapat diparalelkan. Sehingga, speedup maksimum yang akan dicapai hanya akan sebesar konstanta tertentu \citep{amdahl}. Hipotesis ini dikenal dengan Hukum Amdahl dengan persamaan
-
-%     \begin{equation}
-%       S_{latensi}(s) = \frac{1}{1 - p + \frac{p}{s}}
-%     \end{equation} \\
-%     dengan $Q$ adalah jumlah simpul dan $P$ adalah jumlah pola.
-
-%     Hukum Amdahl hanya berlaku pada kasus dengan ukuran masalah yang tetap. Pada prakteknya, semakin besar kapasitas komputasi, ukuran masalah yang dipecahkan juga semakin besar dengan jumlah data yang juga besar, sehingga waktu yang dihabiskan pada porsi sistem yang dapat diparalelkan juga makin besar \citep{gustafson}. Berdasarkan fakta tersebut, Gustafson mengajukan perbaikan pada Hukum Amdahl
-
-%     \begin{equation}
-%       S_{latensi}(s) = 1 - p + sp
-%     \end{equation} \\
-
-%     Terlihat bahwa Hukum Gustafson membuat speedup maksimum menjadi lebih linier dan realistis.
-
-%   \subsection{\emph{Multiprocessing} dan \emph{Multithreading}}
-
-%     Proses adalah program yang sedang dieksekusi. Ketika proses dijalankan, dia memiliki beberapa status: baru, berjalan, menunggu, siap, dan berhenti. Tiap proses memiliki informasi mengenai alokasi memori, status proses, dan isi CPU register yang disebut dengan konteks \citep{os}. Ketika proses ini pertama dilanjutkan dari keadaan menunggu, maka CPU akan memuat konteks proses. Jika ada, proses lain yang akan berjalan, maka CPU akan mengganti konteks proses dengan konteks proses baru yang akan berjalan. Hal ini dikenal dengan \emph{context switching}.
-
-%     Satu proses dapat memiliki banyak thread. Thread didefinisikan sebagai unit terkecil eksekusi dari CPU \citep{os}. Thread dikenal pula dengan proses ringan. Berbeda dengan proses, thread pada proses yang sama dapat berbagi memori yang sama. Penggunaan thread dapat memungkinkan operasi yang IO-bound dan CPU-bound dapat berjalan bersamaan.
-
-%     Multiprocessing yaitu teknik untuk menggunakan proses yang berbeda untuk melakukan suatu pekerjaan. Sedangkan multithreading yaitu teknik yang memungkinkan satu unit pemroses (seperti CPU dan GPU) untuk mengeksekusi banyak thread secara konkuren. Keuntungan multithreading dibandingkan multiprocess adalah masing-masing thread akan berbagi resource dari unit komputasi, seperti memori, cache dan translation lookaside buffer (TLB). Selain itu, komunikasi antar thread juga bisa dilakukan dengan menggunakan memori bersama. 
-
-%   \subsection{Sinkronisasi}
-
-%     Multithreading memungkinkan kita untuk saling berbagi memori yang sama. Namun, ada kerugian dari adanya sharing resource ini. Task antar thread harus menjamin bahwa mereka tidak mengakses dan menimpa memori yang sama atau mereka akan mengakibatkan nilai memori menjadi tidak konsisten. Masalah ini dikenal dengan \emph{race condition}. Race condition terjadi ketika dua atau lebih thread memasuki wilayah yang seharusnya hanya boleh dimasuki satu thread yang disebut \emph{critical section}. 
-
-%     Untuk menghindari terjadinya race condition kita dapat melakukan sinkronisasi proses. Ada beberapa metode sinkronisasi proses yang akan digunakan pada penelitian ini:
-
-%     \begin{enumerate}
-
-%     \item
-%     Mutex lock \\
-%     Mutex 
-
-%     \item
-%     Semaphore \\
-
-%     \item
-%     Barrier \\
-
-%     \end{enumerate}
-
-%  Ketika beberapa thread akan menggunakan critical section, maka flag akan dipasang untuk mencegah thread lain masuk dalam critical section tersebut. Ketika thread tersebut telah keluar dari critical section, flag akan dicabut kembali dan thread lain akan dapat masuk ke dalam critical section. 
-
-%     Ada banyak jenis implementasi dari flag yang 
-%Hal ini bisa diatasi dengan memasang lock pada resoure yang mungkin akan diakses bersama-sama. Lock dapat memandaatkan mutex lock, semaphore, atau dll.
-
-% \section{Struktur Data Trie}
-
-  %Struktur data \emph{trie} adalah struktur data yang digunakan untuk menyimpan himpunan dinamis dari beberapa string \citep{trie59}. Struktur data trie merupakan jenis dari struktur pohon yang memiliki jumlah simpul anak yang tidak tentu. 
-  % Secara umum, \emph{trie} dapat menggambarkan dengan .  % 
-  %Simpul akar \emph{trie} akan dimulai dari simpul kosong. Lalu bercabang ketika ada karakter yang berbeda. Sehingga pencarian string dalam kamus dapat dilakukan dengan menelusuri tiap simpul pada \emph{trie}. Trie dapat dimodelkan sebagai sebuah finite automata. Tiap simpul dapat dimodelkan sebagai status dan huruf atau substring dimodelkan sebagai fungsi transisi. Lalu, setiap simpul awal dan simpul akhir akan ditandai secara khusus. Ketika simpul akhir tercapai, berarti salah satu pola ditemukan.
-
-  %\begin{figure}[htb]
-  %    \centering
-  %    \includegraphics[width=0.8\textwidth]{resources/trie.png}
-  %    \caption[Contoh trie untuk kata "A","to", "tea", "ted", "ten", "i", "in", dan "inn"]{Contoh trie untuk kata "A","to", "tea", "ted", "ten", "i", "in", dan "inn"}
-  %  \end{figure}
-
-  %Strategi implementasi yang biasa dilakukan yaitu dengan menggunakan list untuk menyimpan simpul anak sebanyak jumlah karakter maksimal pada tiap simpul. Bisa juga menggunakan tabel statik untuk menyimpan referensi ke simpul anak. 
-
-  %\subsection{Bitwise Trie}
-
-  %  Bitwise Trie adalah varian trie yang menggunakan operasi bit untuk penelusuran simpul. Berbeda dari trie yang menggunakan karakter sebagai fungsi transisi, bitwise trie hanya memiliki dua simpul anak tiap simpulnya. Meski terlihat lambat, metode ini mengoptimalkan cache lokal
-
-  %\subsection{Trie dengan Kompresi}
-
 \section{\emph{Pattern Matching}}
 
   \emph{Pattern matching} adalah metode mencari kemunculan sebuah string atau substring terhadap string lain. \emph{Pattern matching} menjadi salah satu komponen inti dalam NIDPS. Secara umum ada dua jenis utama pencocokan pola, yaitu \emph{single pattern matching} dan \emph{multi-pattern matching}. 
@@ -200,7 +126,7 @@
 
   \subsection{Algoritma Aho-Corasick}
 
-    Algoritma Aho-Corasick adalah algoritma \emph{multi-pattern matching} yang dapat mencari kemunculan string dalam sebuah kamus \citep{ahoc1975}. Algoritma ini dapat mencari kemunculan setiap string dalam kamus dalam sekali pencocokan. Komponen utama dalam algoritma ini yaitu kamus yang berupa \emph{finite automata} seperti pada Gambar II.3 di bawah. %dan \emph{failure transition}.
+    Algoritma Aho-Corasick adalah algoritma \emph{multi-pattern matching} yang dapat mencari kemunculan string dalam sebuah kamus \citep{ahoc1975}. Algoritma ini dapat mencari kemunculan setiap string dalam kamus dalam sekali pencocokan. Komponen utama dalam algoritma ini yaitu kamus yang berupa \emph{finite automata} seperti pada Gambar II.3 di bawah. 
 
     Kamus berisi kumpulan string \emph{rule} yang akan dicocokkan. Penyusunan kamus hanya perlu dilakukan sekali sebelum pencocokan string dilakukan. Penyusunan kamus dilakukan dalam $O(kp)$, dengan $k$ adalah jumlah string pada kamus dan $p$ adalah panjang maksimum string pada kamus.
 
@@ -209,8 +135,6 @@
       \includegraphics[width=0.6\textwidth]{resources/aho-c.png}
       \caption[\emph{Finite automata} kamus algoritma Aho-Corasick dengan \emph{failure transition}]{\emph{Finite automata} kamus algoritma Aho-Corasick dengan \emph{failure transition} \citep{lin2013}}
     \end{figure}
-
-    % \footnotetext{\citep{lin2013}}
 
     Dalam kamus ada yang disebut \emph{failure transition}. \emph{Failure transition} adalah tabel yang berisi posisi terakhir prefiks yang cocok dengan sufiks string yang telah dilewati. Sehingga ketika pencarian tidak cocok pada suatu string, akan dilanjutkan pada string berikutnya yang prefiksnya cocok dengan sufiks string sebelumnya. Tujuan adanya \emph{failure transition} yaitu untuk menghindari pengulangan ketika adanya \emph{mismatch}. Kompleksitas pencarian algoritma ini yaitu $O(x)$, dengan $x$ adalah panjang string pola.
 
@@ -330,7 +254,7 @@
 
     Selain rancangan \emph{multithreading} pada CPU, telah dilakukan penelitian tentang rancangan arsitektur untuk NIDS pada GPGPU oleh \cite{gnort2008}. Rancangan bertujuan mengakomodasi implementasi algoritma Aho-Corasick pada GPU. Implementasi berdasarkan pada NIDS Snort. Beberapa komponen yang dimodifikasi yaitu implementasi \emph{state machine} dan skema transfer antara \emph{host} dan \emph{device}. 
 
-    Implementasi menggunakan struktur memori untuk menyimpan pola \emph{signature} yang berbentuk \emph{list of string}. \emph{Layout} ini kemudian dimodfikasi menjadi \emph{array} 2D sebelum diimplementasi menggunakan CUDA. Kelebihan \emph{layout} memori ini adalah mudah untuk ditransfer ke memori tekstur. Selain itu algoritma Aho-Corasick memanfaatkan prinsip \emph{locality} dengan baik. Sehingga implementasi memori dapat meningkatkan kinerja pencocokan NIPS hingga 19\%.
+    Implementasi menggunakan struktur memori untuk menyimpan pola \emph{signature} yang berbentuk \emph{list of string}. \emph{Layout} ini kemudian dimodfikasi menjadi \emph{array} 2D sebelum diimplementasi menggunakan CUDA. Kelebihan \emph{layout} memori ini adalah mudah untuk ditransfer ke memori tekstur. Selain itu algoritma Aho-Corasick memanfaatkan prinsip \emph{locality} dengan baik. Sehingga implementasi dengan memori tesktur dapat meningkatkan kinerja pencocokan NIPS hingga 19\%.
 
     Transfer data dari \emph{host} ke \emph{device} maupun \emph{device} ke \emph{host} menggunakan skema \emph{double buffering}. Skema ini menggunakan sebuah \emph{buffer} untuk menampung paket yang ingin dicek menjadi satu batch besar. Batch besar kemudian ditransfer ke memori \emph{device}. Ketika GPU melakukan pemrosesan, maka paket yang baru datang akan ditampung dalam \emph{buffer} berbeda. Sehingga kedua \emph{buffer} dapat selalu bertukar posisi. Hal ini mampu meningkatkan utilitas pengiriman rata-rata paket. 
     
