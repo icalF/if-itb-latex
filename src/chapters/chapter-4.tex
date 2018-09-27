@@ -51,16 +51,17 @@ Pembahasan pada bab ini akan dibagi menjadi dua bagian. Bagian pertama dipaparka
       \item
       \emph{Matcher wrapper} \\
       \emph{Matcher wrapper} adalah \emph{wrapper} dari \emph{kernel} sebelum dijalankan. \emph{Wrapper} akan menyiapkan \emph{payload} masukan sebelum \emph{kernel} dijalankan. Masukan disalin dari \emph{host buffer} ke \emph{device buffer}. Setelah persiapan selesai, \emph{wrapper} akan memanggil kode \emph{kernel} untuk menjalankan pencocokan. Setelah pencocokan selesai dilakukan, \emph{wrapper} akan menyalin \emph{array} hasil dari \emph{device} ke \emph{host}. \emph{Array} hasil tadi akan dikirim ke \emph{reducer} untuk digabungkan.
-      
-      \item
-      \emph{Kernel code} \\
-      \emph{Kernel} adalah kode GPU yang akan dijalankan untuk pencocokan. \emph{Kernel} hanya akan melakukan \emph{looping} terhadap nomor \emph{state} berdasarkan tabel transisi yang telah dimuat. \emph{Looping} akan berhenti ketika \emph{state} telah menuju \emph{state} akhir maupun status \emph{dummy}. Kemudian \emph{state} akhir akan ditulis ke \emph{output array}. \emph{Buffer} akan dibagi menjadi 4 bagian sebagai titik mulai pencocokan. Sehingga tiap \emph{thread} akan mencocokkan sebanyak 4 kali. \emph{Pseudocode} dari kode \emph{kernel} akan terlihat seperti pada Gambar IV.1 berikut.
 
       \begin{figure}[htb]
         \centering
-        \includegraphics[width=0.65\textwidth]{resources/pseudo.png}
+        \includegraphics[width=0.6\textwidth]{resources/pseudo.png}
         \caption[\emph{Pseudocoode kernel}]{\emph{Pseudocoode kernel}}
+        \label{pseudo}
       \end{figure}
+      
+      \item
+      \emph{Kernel code} \\
+      \emph{Kernel} adalah kode GPU yang akan dijalankan untuk pencocokan. \emph{Kernel} hanya akan melakukan \emph{looping} terhadap nomor \emph{state} berdasarkan tabel transisi yang telah dimuat. \emph{Looping} akan berhenti ketika \emph{state} telah menuju \emph{state} akhir maupun status \emph{dummy}. Kemudian \emph{state} akhir akan ditulis ke \emph{output array}. \emph{Buffer} akan dibagi menjadi 4 bagian sebagai titik mulai pencocokan. Sehingga tiap \emph{thread} akan mencocokkan sebanyak 4 kali. \emph{Pseudocode} dari kode \emph{kernel} akan terlihat seperti pada Gambar~\ref{pseudo} di atas.
 
       \item
       \emph{Reducer} \\

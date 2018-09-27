@@ -10,9 +10,7 @@
 
     Berdasarkan pengukuran yang dilakukan oleh \cite{kargus2012}, didapatkan bahwa sebagian besar beban analisa paket berada pada tahap pencarian string pada \emph{payload} paket. Pada tahapan ini, sebagian besar paket yang tidak terindikasi sebagai serangan akan diloloskan. Sehingga beban pencocokan pada tahap berikutnya, yaitu pencocokan \emph{option rule} akan berkurang drastis. Maka, fokus dari solusi yang akan diajukan yaitu implementasi desain yang akan mempercepat kinerja pencocokan \emph{string} paket pada NIDS Snort menggunakan GPU. 
 
-    Sampai saat ini ada beberapa penelitian terkait pencocokan \emph{string} menggunakan GPU. \cite{gnort2008} merancang sebuah arsitektur untuk mengakomodasi algoritma Aho-Corasick pada GPU. Implementasi dilakukan pada NIDS Snort. 
-    
-    Implementasi \emph{state machine} menggunakan tabel 2D untuk memaksimalkan \emph{locality} dan skema transfer antara \emph{host} dan \emph{device} menggunakan \emph{doublle buffering}. Sedangkan \emph{buffer} juga dialokasi dengan \emph{pinned memory}. Desain ini meningkatkan \emph{throughput} rata-rata sistem sebesar 3 kali lipat.
+    Sampai saat ini ada beberapa penelitian terkait pencocokan \emph{string} menggunakan GPU. \cite{gnort2008} merancang sebuah arsitektur untuk mengakomodasi algoritma Aho-Corasick pada GPU. Implementasi dilakukan pada NIDS Snort menggunakan \emph{state machine} yang berbentuk tabel 2D untuk memaksimalkan \emph{locality} dan skema transfer antara \emph{host} dan \emph{device} menggunakan \emph{double buffering}. Sedangkan \emph{buffer} juga dialokasi dengan \emph{pinned memory}. Desain ini meningkatkan \emph{throughput} rata-rata sistem sebesar 3 kali lipat.
 
     Kemudian, \cite{kargus2012} mengajukan solusi untuk mengurangi ketergantungan antar komponen dengan menggunakan \emph{pipelining}. \emph{Thread} untuk operasi analisis dipisahkan dengan \emph{thread} untuk operasi \emph{I/O}. Menggunakan solusi ini \emph{throughput} rata-rata sistem meningkat hingga 4 kali lipat.
 
@@ -20,18 +18,19 @@
 
   \section{Analisis Solusi}
 
-    Eksperimen penggunaan GPGPU pada NIDS akan memodifikasi NIDPS Snort. Snort digunakan karena kode bersifat \emph{open-source} dan mudah untuk dikembangkan, sehingga pengembangan dan eksperimen tidak memerlukan banyak biaya dan dapat dieksplorasi secara mandiri. 
+    Eksperimen penggunaan GPGPU pada pencocokan string NIDS akan memodifikasi NIDPS Snort. Snort digunakan karena kode bersifat \emph{open-source} dan mudah untuk dikembangkan, sehingga pengembangan dan eksperimen tidak memerlukan banyak biaya dan dapat dieksplorasi secara mandiri. 
 
     Pengembangan akan menggunakan platform GPGPU CUDA. Platform CUDA merupakan platform GPGPU yang dibuat pada GPU NVIDIA. Platform CUDA digunakan karena saat ini platform CUDA lebih matang daripada OpenCL. Selain itu, dokumentasi dan contoh CUDA lebih banyak dan API yang lebih sederhana dan spesifik dibanding OpenCL.
 
     \subsection{Struktur IDS Snort}
 
-      Komponen utama yang akan dioptimasi yaitu pencocokan string yang dilakukan setelah preproses. Pencocokan string dilakukan dengan mengimplementasi \emph{interface} MPSE (\emph{multipattern search engine}) yang terdapat pada modul \emph{detect}. Modul ini dipanggil ketika \emph{rule} selesai dikelompokkan berdasarkan servis dan protokol seperti terlihat pada Gambar III.1 di bawah. Tiap \emph{rule group} akan memiliki \emph{instance} MPSE sendiri dan membentuk kamus sesuai \emph{rule} yang ada pada tiap \emph{rule group}.
+      Komponen utama yang akan dioptimasi yaitu pencocokan string yang dilakukan setelah preproses. Pencocokan string dilakukan dengan mengimplementasi \emph{interface} MPSE (\emph{multipattern search engine}) yang terdapat pada modul \emph{detect}. Modul ini dipanggil ketika \emph{rule} selesai dikelompokkan berdasarkan servis dan protokol seperti terlihat pada Gambar~\ref{snort3} di bawah. Tiap \emph{rule group} akan memiliki \emph{instance} MPSE sendiri dan membentuk kamus sesuai \emph{rule} yang ada pada tiap \emph{rule group}.
 
       \begin{figure}[htb]
         \centering
         \includegraphics[width=0.8\textwidth]{resources/snort3.png}
         \caption[Arsitektur Snort versi 3]{Arsitektur Snort versi 3. Pencocokan dilakukan pada bagian Detect}
+        \label{snort3}
       \end{figure}
 
       Setelah pembentukan \emph{instance} dilakukan, maka input akan di-\emph{streaming}, dipreproses, dibagi berdasarkan \emph{rule group}, kemudian disuplai ke \emph{instance} MPSE yang terkait. Hasil pencocokan paket akan dikumpulkan dalam \emph{reducer} untuk kemudian dibandingkan dengan \emph{policy} apakah dianggap paket berbahaya atau tidak.
@@ -67,12 +66,13 @@
       
       Implementasi dari mesin PFAC yang digunakan ada beberapa macam. Salah satu model yang dapat digunakan yaitu dengan bentuk seperti pohon dengan \emph{list of pointer} ke status anak. Namun, model yang dialokasi secara dinamis tidak cocok digunakan dalam GPU karena alokasi pada GPU memiliki latensi yang tinggi. Selain itu, lokasi memori dapat menjadi tidak kontigu dan tidak mendukung adanya \emph{spatial locality}.
       
-      Opsi lainnya yaitu dengan tabel transisi dua dimensi. Untuk tiap status, akan dibuat daftar status transisi terhadap tiap karakter. Model ini lebih sederhana dan juga mendukung adanya \emph{memory coalescing}. Tabel akan dibentuk di \emph{host memory}. Setelah semua pola didaftarkan, tabel akan disalin ke GPU hanya sebesar ukuran tabel yang terisi agar tidak boros memori. Tiap baris menunjukkan transisi dari tiap status yang bukan status akhir dan memiliki 256 kolom. Tabel transisi akan berbentuk seperti Gambar III.2 di bawah.
+      Opsi lainnya yaitu dengan tabel transisi dua dimensi. Untuk tiap status, akan dibuat daftar status transisi terhadap tiap karakter. Model ini lebih sederhana dan juga mendukung adanya \emph{memory coalescing}. Tabel akan dibentuk di \emph{host memory}. Setelah semua pola didaftarkan, tabel akan disalin ke GPU hanya sebesar ukuran tabel yang terisi agar tidak boros memori. Tiap baris menunjukkan transisi dari tiap status yang bukan status akhir dan memiliki 256 kolom. Tabel transisi akan berbentuk seperti Gambar~\ref{trans} di bawah.
 
       \begin{figure}[htb]
         \centering
         \includegraphics[width=0.6\textwidth]{resources/table.png}
         \caption[Tabel transisi]{Tabel transisi dari \emph{state machine} kamus}
+        \label{trans}
       \end{figure}
 
       Untuk mengurangi kebutuhan terhadap penanda status akhir, nomor status akan disusun ulang. Status akhir akan diletakkan pada status pertama hingga ke-N. Sedangkan status lainnya termasuk status awal dimulai dari N+1. Dengan demikian, kebutuhan memori untuk penanda akan berkurang. Selain itu, operasi pengecekan dalam kode \emph{kernel} lebih sederhana dan ringan.
@@ -137,7 +137,7 @@
 
     \subsection{Kebutuhan Perangkat Lunak}
 
-      Berdasarkan analisis yang dilakukan sebelumnya, NIDS yang akan dibangun setidaknya memiliki spesifikasi kebutuhan fungsional seperti yang dijabarkan dalam Tabel III.1.
+      Berdasarkan analisis yang dilakukan sebelumnya, modul yang akan dibangun setidaknya memiliki spesifikasi kebutuhan fungsional seperti yang dijabarkan dalam Tabel III.1.
       
       \input{chapters/requirements.tex}
 
@@ -149,7 +149,7 @@
 
       Arsitektur yang digunakan akan menggunakan arsitektur dasar Snort. Dalam mengimplementasikan modul pencocokan, Snort menyediakan API yang dapat diimplementasi dengan mudah. Sehingga dalam penggabungan modul tersebut, hanya perlu dibuat \emph{wrapper} untuk memanggil modul yang telah diimplementasi secara terpisah.
 
-      Modul akan terdiri dari beberapa komponen. Komponen-komponen tersebut akan tersusun menjadi sebuah \emph{pipeline} seperti pada Gambar III.1. Ada beberapa komponen utama dalam modul pencocokan pola:
+      Modul akan terdiri dari beberapa komponen. Komponen-komponen tersebut akan tersusun menjadi sebuah modul yang akan terintegrasi pada Snort seperti pada Gambar~\ref{dfd}. Ada beberapa komponen utama dalam modul pencocokan pola:
 
       \input{diagrams/module-arch.tex}
       

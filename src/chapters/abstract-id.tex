@@ -15,9 +15,9 @@ Saat ini, banyak transaksi penting terjadi dunia maya. Keamanan informasi menjad
 
 Solusi yang dapat digunakan yaitu penggunaan \emph{multithread} untuk pencocokan yang banyak secara paralel. Solusi \emph{multithreading} telah dikembangkan menggunakan CPU. Namun, CPU memiliki \emph{core} yang sangat terbatas. Alternatif lainnya adalah dengan menggunakan GPU. GPU memiliki kemampuan untuk membangkitkan banyak \emph{thread} sekaligus. GPU sangat cocok untuk melakukan komputasi sederhana dalam jumlah besar. 
 
-Salah satu komponen penting dalam sistem deteksi intrusi yaitu pencocokan string. Beban pencocokan string ini seringkali menjadi \emph{bottleneck} dalam analisis paket jaringan. Tugas akhir ini akan mencoba melakukan eksperimen untuk melakukan implementasi pencocokan string pada sistem deteksi intrusi Snort menggunakan GPU.
+Salah satu komponen penting dalam sistem deteksi intrusi yaitu pencocokan string. Beban pencocokan string ini seringkali menjadi \emph{bottleneck} dalam analisis paket jaringan. Tugas akhir ini akan mencoba melakukan eksperimen untuk melakukan eksperimen pencocokan string pada sistem deteksi intrusi Snort menggunakan GPU.
 
-Untuk dapat mempercepat proses analisis menggunakan GPU, translasi solusi yang ada tidaklah cukup. Operasi dalam GPU seringkali adalah operasi yang I/O \emph{bound} dan \emph{memory bound}. Diperlukan beberapa pengubahan seperti alokasi \emph{thread} yang berbeda, metode transfer memori \emph{host} dan \emph{device}, skema penampungan paket, dan pengubahan struktur data \emph{state machine}. Implementasi dapat menghasilkan \emph{speedup} yang signifikan hingga 3x lipat solusi \emph{multithreading} dengan CPU.
+Untuk dapat mempercepat proses analisis menggunakan GPU, translasi solusi yang ada tidaklah cukup. Operasi dalam GPU seringkali adalah operasi yang I/O \emph{bound} dan \emph{memory bound}. Diperlukan beberapa pengubahan seperti alokasi \emph{thread} yang berbeda, metode transfer memori \emph{host} dan \emph{device}, skema penampungan paket, dan pengubahan struktur data \emph{state machine}. Berdasarkan pengujian, implementasi sekarang dapat menghasilkan \emph{speedup} yang signifikan hingga 3x lipat solusi \emph{multithreading} dengan CPU yang ada.
 
 Kata kunci: \textit{pattern matching}, deteksi intrusi, GPU, optimasi, paralel.
 
