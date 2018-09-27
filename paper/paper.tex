@@ -64,7 +64,6 @@ In general, there are two kinds of string matching: single pattern string matchi
     \begin{figure}[htbp]
         \centerline{\includegraphics[width=0.4\textwidth]{../src/resources/aho-c.png}}
         \caption{Example state machine of Aho-Corasick dictionary.}
-        \label{fig}
     \end{figure}
 
     Aho-Corasick use failure function to perform backtrack after stop at one of the final states. Failure function will redirect this final state to longest pattern prefix which match suffix of the currently matched pattern. Failure function reduce the need of repeating another same sequence which just matched by. By this method, all of containing patterns can be matched by one pass and reducing complexity from $O(mn)$ to $O(n)$. 
@@ -77,7 +76,6 @@ In general, there are two kinds of string matching: single pattern string matchi
     \begin{figure}[htbp]
         \centerline{\includegraphics[width=0.4\textwidth]{../src/resources/boundary.png}}
         \caption{Pattern \textbf{AB} not recognized by both thread 3 and 4}
-        \label{fig}
     \end{figure}
 
     \subsection{Parallel Failureless Aho-Corasick}
@@ -87,7 +85,6 @@ In general, there are two kinds of string matching: single pattern string matchi
     \begin{figure}[htbp]
         \centerline{\includegraphics[width=0.4\textwidth]{../src/resources/pfac.png}}
         \caption{State machine without failure function}
-        \label{fig}
     \end{figure} 
 
 \section{Related Works}
@@ -118,16 +115,31 @@ In general, there are two kinds of string matching: single pattern string matchi
     \subsection{Matching Algorithm}
         In order to implement Aho-Corasick to GPU, we need to exploit SIMD (single instruction multiple data) optimally. Data parallel approach is one of the easiest approach to implement. After splitting chunks, each chunks assign to different threads with extension as long the longest pattern. This approach has 2 problem: the extension increasing data transaction drastically, and not optimal if input splitted to so many chunks. \textcolor{red}{GPU can spawn as hundreds threads and hopefully all threads can be utilized optimally.}
 
-        Alternative solution is by using PFAC. The idea of allocating an individual thread to each byte of an input stream has important implications on the efficiency of the PFAC state machine. First, each thread of PFAC is only responsible for identifying the pattern starting at the thread’s starting position. Therefore, whenever a thread cannot find any pattern located at its beginning position, it terminates immediately without taking failure transitions to backtrack the state machine. In other words, each thread of PFAC runs in the best time $O(1)$ and the worst time $O(m)$ where $m$ is the longest pattern length. Therefore, the failure transitions of the AC state machine are all removed as well as the self-loop transition of the initial state. An AC state machine with all its failure transitions and self-loop transition removed is called a PFAC machine. Fig. 4 shows the PFAC machine to identify the four patterns, “AB,” “ABG,” “BEDE,” and “ED.”
+        Alternative solution is by using PFAC. The idea of allocating an individual thread to each byte of an input stream has important implications on the efficiency of the PFAC state machine. 
+        
+        % First, each thread of PFAC is only responsible for identifying the pattern starting at the thread’s starting position. Therefore, whenever a thread cannot find any pattern located at its beginning position, it terminates immediately without taking failure transitions to backtrack the state machine. In other words, each thread of PFAC runs in the best time $O(1)$ and the worst time $O(m)$ where $m$ is the longest pattern length. Therefore, the failure transitions of the AC state machine are all removed as well as the self-loop transition of the initial state. An AC state machine with all its failure transitions and self-loop transition removed is called a PFAC machine. Fig. 4 shows the PFAC machine to identify the four patterns, “AB,” “ABG,” “BEDE,” and “ED.”
+
+        \begin{enumerate}
+            \item Each thread only be responsible to sequence begins with a character. If there is no match pattern, thread will terminate immediately. Consequently, threads will only last for a short period.
+
+            \item Matching done parallel in warp of 32 threads. Thus, the memory access of those will be coalesced and improve the throughput.
+
+            \item Have no additional space for failure transition. Memory consumption become more efficient and cache hit chances become bigger.
+        \end{enumerate}
+
+        % Huntul ngaceng
 
     \subsection{State Machine Implementation}
-        There are 2 alternatives for state machine implementation: table 2d or linked tree. Structure of linked tree is too complex to be stored in GPU. And allocating memory in GPU is demandly thus this option is less preferable. 
-        Blablas blas about table
+        There are 2 alternatives for state machine implementation: two-dimensional table or trie with pointer. Structure of trie support dynamic modification and link-unlinking. But it is too complex to be stored in GPU. And also memory place could become fragmented and cannot exploit spatial locality. Not to mention the cost allocating memory in GPU is too demandly. So, this option is less preferable. 
+
+        Another design and the easier is two-dimensional table. For each states, there will be transition to, say 256 characters (if the input is unsigned ASCII char). This model is simple and support memory coalescing. If we utilize texture memory, also there will be chances access pattern will be cached.
+
+        After all pattern registered, table will be compiled in the host. And then, table get transferred to device just as the size of filled table. ``Fig.~\ref{table}'' below shows the design of transition table.
 
     \begin{figure}[htbp]
         \centerline{\includegraphics[width=0.4\textwidth]{../src/resources/table.png}}
         \caption{Transition table representation}
-        \label{fig}
+        \label{table}
     \end{figure}
 
     \subsection{Thread Allocation}
@@ -177,7 +189,7 @@ In general, there are two kinds of string matching: single pattern string matchi
     % \begin{figure}[htbp]
     % \centerline{\includegraphics{fig1.png}}
     % \caption{Example of a figure caption.}
-    % \label{fig}
+
     % \end{figure}
 
 \section{Acknowledgment}
