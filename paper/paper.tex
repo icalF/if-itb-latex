@@ -9,17 +9,14 @@
 \usepackage{algorithmic}
 \usepackage{graphicx}
 \usepackage{textcomp}
+\usepackage{multirow}
 \usepackage[table]{xcolor}
 
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
-\title{Peningkatan Kinerja Modul Pencocokan Pola dalam Sistem Deteksi Intrusi Snort Menggunakan GPU\\
-{\footnotesize \textsuperscript{*}Note: Sub-titles are not captured in Xplore and
-should not be used}
-\thanks{Identify applicable funding agency here. If none, delete this.}
-}
+\title{Peningkatan Kinerja Modul Pencocokan Pola dalam Sistem Deteksi Intrusi Snort Menggunakan GPU}
 
 \author{
 \IEEEauthorblockN{Afrizal Fikri}
@@ -38,38 +35,27 @@ imam@informatika.org}
 \maketitle
 
 \begin{abstract}
-    Kemajuan teknologi telah memberikan kontribusi pada pertumbuhan pesat penggunaan data digital. Di era digital ini, banyak data fisik telah diubah menjadi digital. Di antara mereka, banyak data rahasia juga terjadi. Dengan demikian, jaminan keamanan menjadi penting juga. Salah satu titik masuk dari penggunaan berbahaya tersebut berasal dari sisi server. Memastikan otoritas pada server yang menggunakan sistem deteksi intrusi jaringan (NIDS) dapat mengambil sumber daya dan waktu yang sangat besar. Salah satu bagian penting dari NIDS adalah string yang cocok dengan bagian di dalam alat analisa. Berdasarkan alasan ini, makalah ini bertujuan untuk meningkatkan kecepatan deteksi yang cocok untuk memaksimalkan keseluruhan sistem throughput menggunakan GPU bukan CPU. Berdasarkan percobaan dan pengujian, solusi yang diusulkan memiliki waktu operasi yang jauh lebih baik dibandingkan dengan solusi linear state of the art dengan tetap menjaga akurasi.
+    Kemajuan teknologi telah memberikan berpengaruh pada pertumbuhan pesat penggunaan data digital. Di era digital ini, banyak transaksi penting juga dilakukan melalui dunia maya. Mayoritas dari itu adalah data konfidensial yang rahasia. Dengan demikian, jaminan keamanan menjadi sangat penting. Salah satu titik masuk dari penyalahgunaan data berasal dari sisi server. Penjaminan keamanan pada server yang menggunakan sistem deteksi intrusi jaringan (NIDS) dapat menghabiskan sumber daya dan waktu yang banyak. Salah satu bagian penting dari NIDS adalah pencocokan string dalam tahap analisis. Berdasarkan masalah ini, makalah ini akan membahas eksperimen untuk meningkatkan kecepatan pencocokan string untuk memaksimalkan kinerja keseluruhan sistem menggunakan GPU. Berdasarkan percobaan dan pengujian, solusi yang diusulkan memiliki waktu operasi yang jauh lebih baik dibandingkan dengan solusi CPU saat ini dengan tetap menjaga akurasi.
 \end{abstract}
 
 \begin{IEEEkeywords}
     pattern matching; intrusion detection; GPU; parallel computation; CUDA
 \end{IEEEkeywords}
 
-\section{Introduction}
-% The advancement of technology has given contributions to the rapid growth of the use of digital data. In this digital era, lots of physical data have been transformed into the digital ones. One example of the use of digital data is the digital biometric fingerprint data on the Electronic Identity Card (KTP-el). 
-
-% To identify a person, fingerprint matching can be used. There are some techniques to do fingerprint matching. One of popular technique is minutia-based fingerprint matching [1]. The technique can be classified into two categories, nearest neighbor-based and fixed radius-based. Each category has their own advantages and disadvantages. However, there is a technique that combines their advantages without having their drawbacks, i.e. Minutia Cylinder-Code (MCC). 
-
-% Fingerprint matching is a problem, especially in a country that has a large population. According to Indonesian 2010 census, it was found that the total population of Indonesia was approximately 237.641.326 at that time [2]. In regard to this matter, the process of analyzing their fingerprints data could take extremely long time if it done linearly, which is what is currently happening. Thus, there is a need for a parallel fingerprint matching.
+\section{Pendahuluan}
 
 Salah satu sumber daya yang penting untuk dilindungi yaitu \emph{server}. Banyak aspek security yang terdapat pada \emph{server} dan dapat dengan mudah diserang \cite{owasp}. Solusi untuk pengamanan \emph{server} dari \emph{request} berbahaya adalah dengan menggunakan sistem deteksi intrusi jaringan atau \emph{network intrusion detection system} (NIDS). NIDS berfungsi mengenali kemungkinan serangan dari \emph{request} yang diterima pada \emph{server} atau \emph{client} sebagai tindakan pencegahan. Ketika \emph{request} dianggap berbahaya, maka dapat dilakukan tindakan lanjutan untuk mencegah kerusakan lebih lanjut pada aset. NIDS yang melakukan tindakan preventif seperti ini disebut juga NIPS (\emph{network intrusion prevention system}).
 
-Salah satu contoh NIDS yang banyak digunakan adalah NIDS Snort. Snort adalah salah satu NIDS berbasis \emph{signature} yang mencocokan paket dengan \emph{rule} yang telah dikumpulkan. \emph{Rule} Snort terdiri dari beberapa komponen yang bertujuan mengenali \emph{host} asal, \emph{host} tujuan, dan isi paket jaringan. \emph{Rule} yang digunakan berasal dari riset para pakar keamanan dan terus diperbaharui mengikuti pola-pola serangan terbaru.
+Karena adanya peningkatan kecepatan \emph{traffic} internet dan banyaknya serangan yang terjadi, maka dibutuhkan NIDS yang mampu melakukan deteksi dengan lebih cepat. Salah satu \emph{bottleneck} dalam pengecekan paket adalah banyaknya \emph{rule} yang harus dicocokkan \cite{pcre2007}. Sehingga, peningkatan secara signifikan dapat dicapai salah satunya dengan meningkatkan kemampuan komputasi untuk pencocokan banyak paket secara paralel. 
 
-Karena adanya peningkatan kecepatan \emph{traffic} internet dan banyaknya serangan yang terjadi, maka dibutuhkan NIDS yang mampu melakukan deteksi dengan lebih cepat. Salah satu \emph{bottleneck} dalam pengecekan paket adalah banyaknya \emph{rule} yang harus dicocokkan \cite{pcre2007}. Sehingga, peningkatan secara signifikan dapat dicapai salah satunya dengan meningkatkan kemampuan komputasi untuk pencocokan banyak paket secara paralel. Pemanfaatan \emph{multithreading} pada \emph{multicore processor} telah dikembangkan untuk mempercepat kinerja NIDS \cite{multi2004}.
+Komputasi paralel dapat dilakukan dengan \emph{multicore} CPU \cite{multi2004}, \emph{multicore} GPU \cite{gnort2008}, atau prosesor terkustomisasi seperti ASIC dan FPGA \cite{fpga2008}. Perbedaan antara CPU dan GPU adalah bagaimana mereka memproses pekerjaan \cite{cuda}. CPU didesain untuk melakukan komputasi secara serial dengan beberapa \emph{core}, sementara GPU dapat memiliki ribuan unit komputasi yang disebut \emph{stream processor} (SP) yang bekerja secara paralel.
 
-Selain mengoptimalkan penggunaan CPU, alternatif yang dapat digunakan yaitu penggunaan \emph{general purpose} GPU (GPGPU) \cite{4482891}. Dapat juga menggunakan prosesor yang mudah dikustomisasi seperti ASIC atau FPGA \cite{fpga2008}. GPGPU banyak digunakan karena perangkat yang mudah didapatkan, multiguna, dan hanya membutuhkan lebih sedikit kustomisasi daripada ASIC dan FPGA. Selain itu, perbandingan kinerja antara GPGPU dan ASIC atau FPGA tidak terlalu jauh tanpa melakukan kustomisasi lebih lanjut di tingkat \emph{low level} \cite{gnort2008}. Maka, Tugas Akhir ini akan fokus untuk melakukan eksperimen terhadap metode pencocokan \emph{string} pada NIDS yang berbasis GPGPU.
+Berdasarkan tinjauan di atas, penelitian ini akan membahas metode yang dapat digunakan dalam mempercepat pencocokan string pada NIDS dengan memanfaatkan \emph{multithreading} pada GPU. Pengujian akan dilakukan untuk mengukur peningkatan kinerja terhadap solusi CPU yang digunakan oleh NIDS saat ini.
 
-% Parallel processing can be done with multicore CPU, multicore GPU, or multicomputer. The difference between CPU and GPU is how they process task [3]. CPU only has several cores designed to process sequentially, while GPU has thousands of cores designed to do tasks in parallel.
+\section{Pencocokan string}
+Secara umum, ada dua jenis pencocokan string: \emph{single pattern string matching} dan \emph{multi pattern string matching}. Kami akan fokus ke pencocokan \emph{multi pattern string matching}. Ada beberapa algoritma terkenal untuk \emph{multi pattern string matching}, seperti algoritma Aho-Corasick \cite{ahoc1975}, Commentz-Walter \cite{walter1980}, dan Wu-Manber \cite{wu92}. Implementasi akan berbasis variasi dari algoritma Aho-Corasick.
 
-% Based on previous statements, this paper aims to optimize fingerprint matching using Minutia Cylinder-Code with GPU. The optimization will be evaluated and the performance will be compared to the baseline.
-
-Perkembangan teknologi telah begitu cepat 
-
-\section{String Matching}
-Secara umum, ada dua jenis pencocokan string: tunggal pencocokan pola string dan pencocokan pola string. Kami akan fokus ke pencocokan string pola multi. Ada beberapa algoritma terkenal untuk pencocokan string pola multi: Algoritma Aho-Corasick \cite{ahoc1975}, Commentz-Walter \cite{walter1980}, dan Wu-Manber \cite{wu92}. Tulisan ini akan mencoba menerapkan variasi algoritma Aho-Corasick.
-
-    \subsection{Aho-Corasick Algorithm}
+    \subsection{Algoritma Aho-Corasick}
     Algoritma Aho-Corasick adalah jenis algoritma pencocokan string yang bekerja dengan mencocokkan tiap string ke kamus. Kamus akan berisi semua pola untuk dicocokkan dalam bentuk \emph{state machine}.
     
     Dalam algoritma ini, operasi pencocokan dilakukan dengan menelusuri \emph{state machine} untuk tiap karakter dalam string input. Jika sampai pada \emph{final state}, maka string input dianggap cocok dengan salah satu pola. Pencocokan berlanjut hingga string input berakhir. 
@@ -84,7 +70,7 @@ Secara umum, ada dua jenis pencocokan string: tunggal pencocokan pola string dan
     Dalam algoritma ini, akses memori menjadi \emph{bottleneck}. Setiap operasi penelusuran akan mengambil satu entri dari tabel. Karena akses memori lebih mahal daripada komputasi, algoritma ini terbatas dengan memori (\emph{memory bound}) \cite{lin2013}.
 
     \subsection{Data Parallel Aho-Corasick}
-    Untuk membuat Aho-Corasick menjadi \emph{multithreading}, beban pencocokan perlu dibagi ke setiap \emph{thread}. Salah satu caranya adalah dengan mempartisi input menjadi beberapa bagian dan kemudian setiap \emph{thread} akan mencocokkan tiap bagian yang berkorespondensi terhadap kamus. Namun, jika ada pola yang menjangkau beberapa bagian sekaligus, pola tidak akan dikenali pada kedua \emph{thread}. Masalah ini dikenal sebagai \emph{boundary matching problem}. Sehingga perlu memperpanjang sesuai dengan panjang pola terpanjang. Akses memori meningkat menjadi $O((n/s + m) * s) = O(n + ms)$ dengan $s$ adalah banyak bagian. 
+    Untuk membuat Aho-Corasick menjadi \emph{multithreading}, beban pencocokan perlu dibagi ke setiap \emph{thread}. Salah satu caranya adalah dengan mempartisi input menjadi beberapa segmen dan kemudian setiap \emph{thread} akan mencocokkan tiap segmen yang berkorespondensi terhadap kamus. Namun, jika ada pola yang menjangkau beberapa segmen sekaligus, pola tidak akan dikenali pada kedua \emph{thread}. Masalah ini dikenal sebagai \emph{boundary matching problem}. Sehingga perlu memperpanjang sesuai dengan panjang pola terpanjang. Akses memori meningkat menjadi $O((n/s + m) * s) = O(n + ms)$ dengan $s$ adalah banyak segmen. 
 
     \begin{figure}[htbp]
         \centerline{\includegraphics[width=0.4\textwidth]{../src/resources/boundary.png}}
@@ -94,7 +80,7 @@ Secara umum, ada dua jenis pencocokan string: tunggal pencocokan pola string dan
     \subsection{Parallel Failureless Aho-Corasick}
     Metode lain untuk mengadaptasi Aho-Corasick dengan \emph{multithreading} adalah membagi \emph{thread} ke semua \emph{byte} karakter. Setiap \emph{thread} akan mencocokkan pola yang dimulai dengan karakter yang berkorespondensi dan selesai ketika ada \emph{final state} atau tidak ada transisi yang valid pada karakter \cite{lin2013}. Konsekuensinya adalah setiap \emph{thread} paling banyak hanya akan cocok dengan satu pola.
     
-    Dengan demikian, \emph{failure function} tidak diperlukan lagi. Selain itu, \emph{boundary matching problem} tidak akan terjadi dengan menggunakan pendekatan ini. Pendekatan ini dinamakan juga sebagai \emph{Parallel Failureless Aho-Corasick} (PFAC).
+    Dengan demikian, \emph{failure function} tidak diperlukan lagi. Selain itu, \emph{boundary matching problem} tidak akan terjadi dengan menggunakan pendekatan ini. Pendekatan ini dinamakan juga sebagai \emph{parallel failureless Aho-Corasick} (PFAC).
 
     \begin{figure}[htbp]
         \centerline{\includegraphics[width=0.4\textwidth]{../src/resources/pfac.png}}
@@ -107,29 +93,29 @@ Secara umum, ada dua jenis pencocokan string: tunggal pencocokan pola string dan
 
         Dalam tulisan ini, implementasi pencocokan berbasis GPU telah diusulkan menggunakan algoritma Aho-Corasick. Selain pemanfaatan GPU multithreading, ada beberapa penyesuaian untuk mengimpor Aho-Corasick ke GPGPU. Mesin negara dibangun menggunakan tabel transisi pada tabel 2D pada memori tekstur. Berdasarkan eksperimen, penerapan ini meningkatkan kinerja sebesar 19\% \cite{gnort2008}.
         
-        Untuk skema transfer memori, skema \emph{double buffering} diusulkan. Paket akan di-batch dalam satu \emph{buffer}. Setiap kali \emph{buffer} penuh, semua paket ditransfer ke GPU dalam satu operasi. Mentransfer dari perangkat ke host juga dilakukan dengan cara yang sama. Semua hasil akan dikumpulkan di \emph{buffer} kedua dan ditransfer ketika penuh.
+        Untuk skema transfer memori, skema \emph{double buffering} diusulkan. Paket akan di-batch dalam satu \emph{buffer}. Setiap kali \emph{buffer} penuh, semua paket ditransfer ke GPU dalam satu operasi. Mentransfer dari \emph{perangkat} ke \emph{host} juga dilakukan dengan cara yang sama. Semua hasil akan dikumpulkan di \emph{buffer} kedua dan ditransfer ketika penuh.
         
-        Trik optimasi lain yang digunakan adalah menggunakan \emph{pinned memory}. Kedua \emph{buffer} in host akan manggunanakan \emph{pinned memory} untuk mengurangi swappiness. Dan juga \emph{pinned memory} memungkinkan transfer secara langsung tanpa melalui CPU atau \emph{direct memory access} (DMA) dan mengurangi kebutuhan komputasi dan latensi. Desain ini dapat meningkatkan kinerja sistem hingga 3,2 kali lebih tinggi daripada implementasi menggunakan \emph{multithreading} pada CPU.
+        Trik optimasi lain yang digunakan adalah menggunakan \emph{pinned memory}. Kedua \emph{buffer} in \emph{host} akan manggunanakan \emph{pinned memory} untuk mengurangi swappiness. Dan juga \emph{pinned memory} memungkinkan transfer secara langsung tanpa melalui CPU atau \emph{direct memory access} (DMA) dan mengurangi kebutuhan komputasi dan latensi. Desain ini dapat meningkatkan kinerja sistem hingga 3,2 kali lebih tinggi daripada implementasi menggunakan \emph{multithreading} pada CPU.
 
     \subsection{Scalable Architecture for Maximizing GPU Utilization}
 
-        Dengan profiling, disimpulkan bahwa hambatan terjadi pada 3 komponen: akuisisi paket, pencocokan string pola multi, dan pencocokan aturan opsi oleh ekspresi reguler. Selain itu, di dalam komponen senar string saja, rata-rata utilisasi GPU masih rendah. Makalah ini menerapkan perbaikan arsitektur di sekitar NIDS. \ textcolor {red} {Metode yang diusulkan} adalah pipelining dan payload batching. Pipelining digunakan untuk memisahkan penggunaan benang dalam transfer dan pencocokan. Dan dengan arsitektur ini, NIDS dapat diskalakan ke beberapa GPU dan CPU contoh inti \ cite {kargus2012}.
+        Dengan profiling, disimpulkan bahwa \emph{bottleneck} terjadi pada 3 komponen: akuisisi paket, pencocokan string, dan pencocokan aturan opsi oleh \emph{regular expression}. Selain itu, khususnya di dalam komponen pencocokan string, rata-rata utilisasi GPU masih rendah. Penelitian ini mencoba menerapkan perbaikan arsitektur pada NIDS. Diantara metode yang diusulkan adalah \emph{pipelining} dan \emph{payload batching}. \emph{Pipelining} digunakan untuk memisahkan penggunaan \emph{thread} untuk transfer dan pencocokan. Dan dengan arsitektur ini, NIDS dapat ditingkatkan ke beberapa GPU dan CPU \emph{core} inti \cite{kargus2012}.
         
-        Perbaikan yang dicapai dengan metode ini adalah sekitar 1,5 hingga 4 kali lebih tinggi dibandingkan dengan garis dasar Snort. Evaluasi dilakukan menggunakan CPU ganda Intel X5680 dengan masing-masing 12 core dan GPU ganda NVIDIA GTX 580. NIDS dijalankan di bawah lalu lintas jaringan dengan kapasitas sekitar 40 Gbps dan bisa mencapai throughput 25,2 Gbps.
+        Perbaikan yang dicapai dengan metode ini adalah sekitar 1,5 hingga 4 kali lebih baik dibandingkan dengan solusi \emph{baseline} Snort. Evaluasi dilakukan menggunakan CPU ganda Intel X5680 dengan masing-masing 12 core dan GPU ganda NVIDIA GTX 580. NIDS dijalankan di bawah \emph{traffic} jaringan dengan kapasitas sekitar 40 Gbps dan bisa mencapai \emph{throughput} 25,2 Gbps.
 
     \subsection{Failureless Aho-Corasick by Maximizing Shared Memory Usage}
 
-        Salah satu cara untuk melakukan pencocokan Aho-Corasick adalah dengan menetapkan setiap byte input ke setiap utas secara bersamaan. Kemudian setiap utas akan melakukan pencocokan \ textcolor {red} {begin} dengan byte assined. Pencocokan berhenti setiap kali keadaan akhir atau transisi tidak valid terjadi. Pendekatan ini tidak memerlukan fungsi kegagalan. Sehingga setiap utas hanya bertanggung jawab untuk mencocokkan paling banyak satu pola \ cite {lin2013}.
+        Salah satu cara untuk melakukan pencocokan Aho-Corasick adalah dengan menetapkan setiap \emph{byte} input ke setiap \emph{thread} secara bersamaan. Kemudian setiap \emph{thread} akan melakukan pencocokan yang dimulai dengan \emph{byte} yang ditetapkan. Pencocokan berhenti setiap kali masuk \emph{final state} atau transisi valid tidak ada. Pendekatan ini tidak memerlukan \emph{failure function}. Sehingga setiap \emph{thread} hanya bertanggung jawab untuk mencocokkan paling banyak satu pola \cite{lin2013}.
         
-        Pendekatan baru ini memanfaatkan penggabungan memori dalam GPU sehingga byte yang berurutan dapat dimuat sekaligus. Untuk lebih meningkatkan kinerja, transisi dari keadaan awal akan dimuat ke memori bersama untuk mengurangi transaksi ke memori global.
+        Pendekatan baru ini memanfaatkan \emph{memory coaelescing} dalam GPU sehingga \emph{byte} yang berurutan dapat dimuat sekaligus. Untuk lebih meningkatkan kinerja, transisi dari \emph{state} awal akan dimuat ke \emph{shared memory} untuk mengurangi transaksi ke \emph{global memory}.
         
-        Untuk tabel transisi, kami tidak dapat memastikannya cocok dengan memori bersama. Jadi, sebagai alternatif untuk memori bersama, tabel transisi akan terikat ke memori tekstur sebagai gantinya. Memori tekstur memiliki beberapa kelebihan. Tekstur memori memiliki cache lebih besar dan cocok untuk melakukan pengambilan dengan pola akses yang sulit diprediksi. Pengujian menggunakan dataset PCAP dari DEFCON menunjukkan peningkatan kinerja yang signifikan. Menggunakan CPU Intel Core i7-950 dan GPU NVIDIA GTX 580, throughput sistem bisa menjadi 3 kali dibandingkan dengan Snort baseline.
+        Karena tabel transisi dapat sangat besar, \emph{shared memory} tidak dapat menampung tabel transisi. Sehingga, sebagai alternatif untuk tabel transisi akan diikat ke \emph{texture memory}. \emph{Texture memory} memiliki beberapa kelebihan seperti memiliki \emph{cache} lebih besar dan cocok untuk melakukan akses dengan pola akses yang sulit diprediksi. Pengujian menggunakan dataset PCAP dari DEFCON menunjukkan peningkatan kinerja yang signifikan. Menggunakan CPU Intel Core i7-950 dan GPU NVIDIA GTX 580, \emph{throughput} sistem bisa menjadi 3 kali dibandingkan dengan Snort \emph{baseline}.
 
 \section{Proposed Solution}
     \subsection{Matching Algorithm}
-        Untuk mengimplementasikan Aho-Corasick ke GPU, kita perlu mengeksploitasi SIMD (instruksi tunggal banyak data) secara optimal. Pendekatan paralel data adalah salah satu pendekatan yang paling mudah untuk diterapkan. Setelah memisahkan potongan, masing-masing potongan menugaskan ke benang berbeda dengan ekstensi sepanjang pola terpanjang. Pendekatan ini memiliki 2 masalah: ekstensi meningkatkan transaksi data secara drastis, dan tidak optimal jika masukan dipisah menjadi banyak potongan. \ textcolor {red} {GPU dapat menelurkan ratusan benang dan semoga semua utas dapat dimanfaatkan secara optimal.}
+        Untuk mengimplementasikan Aho-Corasick ke GPU, kita perlu mengeksploitasi SIMD (\emph{single instruction multiple data}) secara optimal. Pendekatan data paralel adalah salah satu pendekatan yang paling mudah untuk diterapkan. Masukan ada dipartisi menjadi beberapa segmen. Setelah memisahkan segmen, masing-masing segmen akan dijalankan di \emph{thread} berbeda dengan ekstensi sepanjang pola terpanjang. Pendekatan ini memiliki 2 masalah: ekstensi meningkatkan transaksi data secara drastis, dan tidak optimal jika masukan dipisah menjadi banyak segmen. GPU dapat membangkitkan ratusan \emph{thread} dan dengan demikian semua \emph{thread} dapat dimanfaatkan secara optimal.
         
-        Solusi alternatif adalah dengan menggunakan PFAC. Ide mengalokasikan thread individu ke setiap byte dari aliran input memiliki implikasi penting pada efisiensi mesin negara PFAC.
+        Alternatif lain adalah dengan menggunakan metode yang disebut PFAC. Ide mengalokasikan tiap \emph{thread} ke setiap \emph{byte} dari aliran input memiliki implikasi penting pada efisiensi \emph{state machine} PFAC.
 
         \begin{enumerate}
             \item 
@@ -143,11 +129,11 @@ Secara umum, ada dua jenis pencocokan string: tunggal pencocokan pola string dan
         \end{enumerate}
 
     \subsection{Implementasi \emph{State Machine}}
-        Ada 2 alternatif untuk implementasi mesin negara: tabel dua dimensi atau trie dengan pointer. Struktur trie mendukung modifikasi dinamis dan link-unlinking. Tetapi terlalu rumit untuk disimpan di GPU. Dan juga tempat ingatan bisa menjadi terfragmentasi dan tidak dapat mengeksploitasi lokalitas spasial. Belum lagi biaya mengalokasikan memori di GPU terlalu menuntut. Jadi, opsi ini kurang disukai.
+        Ada 2 alternatif untuk implementasi mesin negara: tabel dua dimensi atau trie dengan pointer. Struktur trie mendukung modifikasi dinamis. Tetapi implementasinya terlalu rumit untuk disimpan di GPU. Dan juga memori bisa jadi terfragmentasi dan tidak dapat mengeksploitasi \emph{spatial locality}. Selain itu biaya mengalokasikan memori di GPU sangat besar. Sehingga opsi ini kurang disukai.
         
-        Desain lain dan yang lebih mudah adalah meja dua dimensi. Untuk masing-masing negara bagian, akan ada transisi ke, katakanlah 256 karakter (jika input adalah unsigned ASCII char). Model ini sederhana dan mendukung penggabungan memori. Jika kita menggunakan memori tekstur, juga akan ada pola akses peluang yang akan di-cache.
+        Desain lain dan yang lebih mudah adalah tabel dua dimensi. Untuk masing-masing \emph{state}, akan ada transisi ke, katakanlah 256 karakter (dengan tipe input adalah karakter ASCII \emph{unsigned}). Model ini sederhana dan mendukung \emph{memory coalescing}. Jika kita menggunakan \emph{texture memory}, juga akan ada peluang pola akses yang akan di-\emph{cache}.
         
-        Setelah semua pola terdaftar, tabel akan dikompilasi di host. Dan kemudian, meja dipindahkan ke perangkat seperti ukuran tabel yang terisi. Gambar. ~\ref{table} di bawah ini menunjukkan desain tabel transisi.
+        Setelah semua pola terdaftar, tabel akan dikompilasi di \emph{host}. Dan kemudian, tabel ditransfer ke \emph{perangkat} sebanyak ukuran tabel yang terisi. Gambar. ~\ref{table} di bawah ini menunjukkan desain tabel transisi.
 
         \begin{figure}[htbp]
             \centerline{\includegraphics[width=0.4\textwidth]{../src/resources/table.png}}
@@ -167,23 +153,51 @@ Secara umum, ada dua jenis pencocokan string: tunggal pencocokan pola string dan
 
         Dengan memanfaatkan sifat \emph{early terminate} pada PFAC, penggunaan \emph{shared memory} dapat dihemat. Transisi dari \emph{state} awal akan selalu diakses namun kemungkinan pencocokan berhenti sangat tinggi \cite{lin2013}. Sehingga transisi ini akan dimuat ke \emph{shared memory} untuk menurunkan latensi ketika pembacaan tabel transisi.
 
-        % kemudian masukan
+        Sisa tabel transisi yang masih ada di \emph{global memory} akan ditingkatkan dengan \emph{texture memory}. Diantara keuntungan \emph{texture memory} adalah memiliki \emph{cache} yang lebih besar dan mampu melakukan transpolasi sehingga dapat memanfaatkan \emph{cache} untuk pola yang susah ditebak \cite{lin2013}. Kelemahan \emph{texture memory} data ditulis hanya dari \emph{host}, cocok dengan skema pencocokan yang melakukan kompilasi kamus sekali dalam satu \emph{rule group}.
 
-        Sisa tabel transisi yang masih ada di \emph{global memory} akan ditingkatkan dengan \emph{texture memory}. Diantara keuntungan \emph{texture memory} adalah memiliki \emph{cache} yang lebih besar dan mampu melakukan transpolasi sehingga dapat memanfaatkan \emph{cache} untuk pola yang susah ditebak \cite{lin2013}. Kelemahan \emph{texture memory} data ditulis hanya dari host, cocok dengan skema pencocokan yang melakukan kompilasi kamus sekali dalam satu \emph{rule group}.
+        Metode lainnya yaitu dengan melakukan \emph{batching} dan menyimpan batch dalam \emph{pinned memory}. \emph{Pinned memory} adalah memori yang dialokasi di \emph{host} dan tidak dapat di-\emph{swap} ke disk. Penggunaan \emph{pinned memory} untuk \emph{buffer} input dapat menurunkan kemungkinan swappiness untuk ukuran \emph{buffer} yang besar. Selain itu, \emph{pinned memory} juga memungkinkan adanya DMA dari \emph{host} ke \emph{device} maupun sebaliknya \cite{gnort2008}.
 
-        Metode lainnya yaitu dengan melakukan batching dan menyimpan batch dalam pinned memory. Pinned memory adalah memori yang dialokasi di host dan tidak dapat diswap ke disk. Penggunaan pinned memory untuk buffer input dapat menurunkan kemungkinan swappiness untuk ukuran buffer yang besar. Selain itu, pinned memory juga memungkinkan adanya DMA dari host ke device maupun sebaliknya \cite{gnort2008}.
+        Penggunaan \emph{thread} per \emph{block} dibatasi sebesar 32 \emph{thread} untuk mencegah \emph{bank conflict}. Ukuran \emph{bank} pada \emph{shared memory} pada GPU NVIDIA 940MX yang memiliki arsitektur Maxwell yaitu 32. Jika akses ke \emph{shared memory} lebih besar dari ukuran \emph{bank}, operasi akan diserialisasi dan berdampak ke latensi secara signifikan \cite{lin2013}.
 
-        % Thread reduce bank conflict
+\section{Implementasi pada Snort}
+    Dalam mengimplementasi modul pencocokan string, akan digunakan \emph{interface} MPSE (\emph{multi pattern search engine}). Modul deteksi pada Snort akan memuat semua kelas yang mengimplementasi \emph{interface} MPSE. Pilihan metode pencocokan akan diberikan dari konfigurasi sesuai definisi pada file header.
 
-\section{Implementation pada Snort}
-    \subsection{\emph{Interface} MPSE}
-        Dalam mengimplementasi modul pencocokan string, akan digunakan \emph{interface} MPSE (\emph{multi pattern search engine}). Modul deteksi pada Snort akan memuat semua kelas yang mengimplementasi \emph{interface} MPSE. Pilihan metode pencocokan akan diberikan dari konfigurasi sesuai definisi pada file header.
+    \emph{Interface} MPSE sendiri berisi beberapa fungsi yang digunakan untuk analisis sebagaimana pada Tabel~\ref{mpse} berikut.
 
-        \emph{Interface} MPSE sendiri berisi beberapa fungsi yang digunakan untuk analisis sebagaimana pada tabel 
-        % What provided? And how you implement those interface?
+    \begin{table}[htbp]
+    \caption{Fungsi yang diimplementasi}
+    \begin{center}
+    \begin{tabular}{|m{2cm}|m{5cm}|}
+    \hline
+    \rowcolor{gray!15}
+    \textbf{Nama fungsi}& \textbf{Deskripsi} \\
+    \hline
+    \textit{init} & Menginisiasi struktur data dan melakukan alokasi \\
+    \hline
+    \textit{register} & Mendaftarkan pola ke dalam larik, sekaligus memperbarui jumlah \emph{state} maksimal \\
+    \hline
+    \textit{compile} & Membentuk kamus berdasarkan pola yang telah didaftarkan \\
+    \hline
+    \textit{match} & Melakukan pencocokan string ke kamus yang dibentuk \\
+    \hline
+    \textit{cleanup} & Melakukan dealokasi dan menghapus semua informasi pencocokan \\
+    \hline
+    \end{tabular}
+    \label{mpse}
+    \end{center}
+    \end{table}
 
-    \subsection{Modules}
-        % Connect interface to your design 
+    Kemudian juga diimplementasi struktur data \emph{handle} yang akan menampung tabel dan larik yang diperlukan oleh MPSE. Isi dari \emph{handle} milik PFAC yaitu:
+
+    \begin{enumerate}
+        \item Larik untuk daftar pola yaitu \emph{array of string}
+        \item Tabel transisi
+        \item Tabel temporer untuk menampung daftar pola
+        \item Larik untuk hasil pencocokan berupa \emph{array of integer}
+        \item Jumlah \emph{state} maksimal
+        \item Jumlah \emph{state} efektif
+        \item Jumlah \emph{final state}
+    \end{enumerate}
 
 \section{Pengujian}
     \subsection{Strategi Pengujian}
@@ -194,7 +208,32 @@ Secara umum, ada dua jenis pencocokan string: tunggal pencocokan pola string dan
         \begin{table}[htbp]
             \caption {Spesifikasi Lingkungan Pengujian}
             \begin{center}
-            \input{../src/tables/specs.tex}
+                \begin{tabular}{|l|l|}
+                    \hline
+                    \rowcolor{gray!15}
+                    \textbf{Komponen} & \textbf{Spesifikasi} \\
+                    \hline                    
+                    Sistem Operasi & Ubuntu 16.04.5 amd64 \\
+                    \hline                    
+                    CPU & Intel Core i7-7500U CPU @ 2.70GHz × 4 \\
+                    \hline                    
+                    \emph{Host} RAM & 16 GB \\
+                    \hline                    
+                    Media Penyimpanan & SSD SATA III 6 Gbps \\
+                    \hline                    
+                    GPU & NVIDIA GeForce 940MX \\
+                    \hline                    
+                    Arsitektur GPU & Maxwell \\
+                    \hline                    
+                    \emph{Compute Capability} & 5.0 \\
+                    \hline                    
+                    \emph{Dedicated Video} RAM & 2 GB \\
+                    \hline                    
+                    CUDA \emph{Runtime} & CUDA 8.0 r2 \\
+                    \hline                    
+                    C/C++ \emph{Compiler} & GCC 5.4.0 \\
+                    \hline                    
+                    \end{tabular}
             \label{test-spec}
             \end{center}
         \end{table}
@@ -219,10 +258,24 @@ Secara umum, ada dua jenis pencocokan string: tunggal pencocokan pola string dan
 
         \end{enumerate}
         
-    \subsection{Pengujian Kinerja}
-        asd
+    \subsection{Hasil Pengujian Kinerja}
+        Pengujian dilakukan dengan menjalankan Snort dengan konfigurasi \emph{data acquisition} PCAP, yaitu membaca berkas PCAP dan menggunakan \emph{single thread} untuk implementasi GPU dan 4 \emph{thread} untuk implementasi bawaan Snort. \emph{Ruleset} yang digunakan yaitu Snort VRT 3000 yang didapat dari laman Snort. Pengujian dilakukan untuk ukuran \emph{buffer} yang bervariasi, yaitu 128 kB, 512 kB, 1024 kB, dan 2018 kB.
+
+        \input{../src/tables/test-result.tex} 
+
+        Hasil skenario 1 memilki kapasitas paling rendah. Alasannya yaitu karena operasi pencocokan \emph{string} adalah operasi yang \emph{memory-bound}. Diperlukan banyak akses ke penyimpanan kamus untuk mendapatkan transisi ke \emph{next state}. Karena kamus disimpan di \emph{global memory}, maka \emph{fetch} ke \emph{global memory} menjadi sering dan menimbulkan latensi yang cukup besar.
+        
+        Skenario 2 secara umum lebih cepat beberapa kali daripada skenario 1, yaitu sekitar 15 kali lipat lebih cepat. Hal ini karena kecepatan akses \emph{global memory} lebih besar dari \emph{shared memory}. Dalam skenario ini, \emph{input string} seharusnya tidak berpengaruh banyak karena adanya \emph{coalescing access}. Sehingga pemuatan baris transisi dari \emph{state} awal ke \emph{shared memory} memiliki pengaruh yang besar terhadap \emph{throughput} sistem. Ini menunjukkan bahwa mayoritas \emph{thread} akan berhenti pada awal pencocokan.
+        
+        Skenario 3 tidak terlalu berpengaruh terhadap skenario 2. Keuntungan \emph{pinned memory} tidak terlalu terlihat bahkan cenderung memperlambat. Sejalan dengan eksperimen yang dilakukan \cite{gnort2008}. Ini karena \emph{pinned memory} memiliki \emph{overhead} saat alokasi dan dealokasi. Kemungkinan besar ini terjadi karena ukuran \emph{buffer} belum terlalu besar. \emph{Overhead} saat alokasi masih belum sebanding dengan perbedaan \emph{transfer} antara DMA dan melalui CPU. Selain itu, juga tidak terjadi \emph{swap} terhadap \emph{page} yang terdapat \emph{buffer} karena ukuran memori masih kecil.
+        
+        Sedangkan skenario 4 baru terlihat perbedaan signifikan terhadap skenario 2 dan 3 pada \emph{buffer} sebesar 1 MB ke atas. Terlihat bahwa adanya \emph{cache} pada memori tekstur membantu menurunkan akses ke memori global dan meningkatkan kinerja keseluruhan modul. 
 
 \section{Kesimpulan}
+ 
+    Peningkatan kinerja pencocokan string pada IDS Snort menggunakan GPU berhasil dilakukan dengan cara mengubah pendekatan algoritma yang digunakan agar memaksimalkan utilisasi GPU. Implementasi dilakukan berbasis teknik PFAC. Teknik ini memanfaatkan kemampuan GPU untuk membangkitakan banyak \emph{thread} serta \emph{memory coalescing} ketika mengakses karakter yang bersebelahan dalam \emph{stream}.    
+    Operasi pencocokan string dari kamus merupakan operasi yang \emph{memory bound} sehingga dilakukan beberapa teknik untuk mengurangi \emph{latency gap} antara akses I/O, memori dan komputasi GPU. Di antara teknik yang digunakan yaitu penggunaan \emph{pinned memory} pada \emph{buffer input} dan \emph{texture memory} pada kamus. Selain itu, digunakan juga penggunaan \emph{shared memory} untuk menampung \emph{buffer input} dan tabel transisi dari \emph{state} awal untuk menghemat \emph{fetch} pada memori global.
+    Parametrisasi dapat dilakukan pada ukuran \emph{buffer input}. Dengan menambah ukuran \emph{buffer input}, jumlah pengiriman paket dari \emph{host} ke \emph{device} dapat berkurang dan dapat menurunkan latensi secara drastis.
 
 % \section{Acknowledgment}
 
