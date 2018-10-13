@@ -1,20 +1,10 @@
-@conference{4026885,
-    author={W. Vogels},
-    booktitle={IEEE International Conference on Services Computing (SCC'06)},
-    title={Web Services at Amazon.com},
-    year={2006},
-    pages={xxii-xxii},
-    keywords={Distributed computing, Technological innovation, Web services},
-    doi={10.1109/SCC.2006.116},
-    month={Sept}
-}
-@online{perrin2008,
-    author={C. Perrin},
-    title={The CIA Triad},
-    year={2008},
-    url={http://www.techrepublic.com/blog/it-security/the-cia-triad/},
-    urldate={2017-04-12}
-}
+@book{nist2003, 
+    place={Gaithersburg, MD}, 
+    title={Standards for Security Categorization of Federal Information and Information Systems}, 
+    publisher={Computer Security Division, Information Technology Laboratory, National Institute of Standards and Technology}, 
+    author={Evans, Donald and Bond, Philips and Bement, Arden}, 
+    year={2003}
+} 
 @book{parker1998,
     place={New York},
     title={Fighting Computer Crime: a New Framework for Protecting Information},
@@ -33,24 +23,16 @@
     year = {2015},
     file = {Guide-to-Computer-Network-Security-3rd-Edition-2015.pdf:/media/Fikri/TA/storage/QJT6BUQI/Guide-to-Computer-Network-Security-3rd-Edition-2015.pdf:application/pdf}
 }
-@misc{owasp2013,
-    year={2013},
-    title={OWASP Top 10 2013},
-    url={https://www.owasp.org/index.php/Top_10_2013-Top_10},
-    publisher={OWASP}
-}
-@misc{snort,
-    title={Snort Users Manual},
-    url={http://manual-snort-org.s3-website-us-east-1.amazonaws.com/},
-    note={The Snort Project vol. 2.9.8.2},
-    month=nov,
-    year={2016},
-    urldate={2017-03-22},
-    publisher={Cisco}
+@misc{owasp, 
+    author={OWASP},
+    title={{OWASP Top 10 Application Security Risks - 2017}},
+    year={2017}, 
+    url={https://www.owasp.org/index.php/Top_10-2017_Top_10}, 
+    journal={OWASP}
 }
 @inproceedings{pcre2007,
     author = {Mitra, Abhishek and Najjar, Walid and Bhuyan, Laxmi},
-    title = {Compiling PCRE to FPGA for Accelerating SNORT IDS},
+    title = {{Compiling PCRE to FPGA for Accelerating SNORT IDS}},
     booktitle = {Proceedings of the 3rd ACM/IEEE Symposium on Architecture for Networking and Communications Systems},
     series = {ANCS '07},
     year = {2007},
@@ -67,7 +49,7 @@
 } 
 @inproceedings{multi2004,
     author = {Haagdorens, Bart and Vermeiren, Tim and Goossens, Marnix},
-    title = {Improving the Performance of Signature-based Network Intrusion Detection Sensors by Multi-threading},
+    title = {{Improving the Performance of Signature-based Network Intrusion Detection Sensors by Multithreading}},
     booktitle = {Proceedings of the 5th International Conference on Information Security Applications},
     series = {WISA'04},
     year = {2005},
@@ -86,18 +68,13 @@
     doi = {10.1145/2659651.2659723},
     abstract = {Pattern Matching is a computationally intensive task used in many research fields and real world applications. Due to the ever-growing volume of data to be processed, and increasing link speeds, the number of patterns to be matched has risen significantly. In this paper we explore the parallel capabilities of modern General Purpose Graphics Processing Units (GPGPU) applications for high speed pattern matching. A highly compressed failure-less Aho-Corasick algorithm is presented for Intrusion Detection Systems on off-the-shelf hardware. This approach maximises the bandwidth for data transfers between the host and the Graphics Processing Unit (GPU). Experiments are performed on multiple alphabet sizes, demonstrating the capabilities of the library to be used in different research fields, while sustaining an adequate throughput for intrusion detection systems or DNA sequencing. The work also explores the performance impact of adequate prefix matching for alphabet sizes and varying pattern numbers achieving speeds up to 8Gbps and low memory consumption for intrusion detection systems.},
     timestamp = {2017-05-13T12:12:43Z},
-    archivePrefix = {arXiv},
-    eprinttype = {arxiv},
-    eprint = {1704.02272},
     primaryClass = {cs},
     urldate = {2017-05-13},
-    journal = {arXiv:1704.02272 [cs]},
     author = {Bellekens, Xavier and Tachtatzis, Christos and Atkinson, Robert and Renfrew, Craig and Kirkham, Tony},
     year = {2014},
     keywords = {Computer Science - Cryptography and Security,Computer Science - Distributed; Parallel; and Cluster Computing,D.4.6,K.6.5},
     pages = {302--309},
-    annote = {Comment: Published in The 7th International Conference of Security of Information and Networks, SIN 2014, Glasgow, UK, September, 2014},
-    file = {1704.02272.pdf:/media/Fikri/TA/storage/MT8996DD/1704.02272.pdf:application/pdf}
+    journal = {The 7th International Conference of Security of Information and Networks, SIN 2014, Glasgow, UK, September, 2014},
 }
 @inproceedings{khamphakdee2014,
     title = {Improving {{Intrusion Detection System}} Based on {{Snort}} Rules for Network Probe Attack Detection},
@@ -140,10 +117,9 @@
     year = {2008},
     keywords = {Application software,Communication system security,Computer graphics,Computer science,Concurrent computing,Coprocessors,GPU,GPU computation power,graphics processing unit,IDS,intrusion detection,multiple pattern matching algorithm,network application,network intrusion detection system,network security,packet content,Parallel processing,pattern match,pattern matching,pattern matching coprocessor,Power engineering and energy,security of data,texture format},
     pages = {62--67},
-    file = {huang2008.pdf:/media/Fikri/TA/storage/FWSKZFCA/huang2008.pdf:application/pdf;IEEE Xplore Abstract Record:/media/Fikri/TA/storage/NK2NUH65/4482891.html:text/html}
 }
 @article{fpga2008,
-    title={An FPGA-Based Network Intrusion Detection Architecture},
+    title={{An FPGA-Based Network Intrusion Detection Architecture}},
     volume={3}, number={1},
     pages={118-132},
     month=mar,
@@ -153,7 +129,7 @@
     year={2008}
 }
 @inproceedings{gnort2008,
-    title = {Gnort: {{High Performance Network Intrusion Detection Using Graphics Processors}}},
+    title = {{{Gnort:}} {{High Performance Network Intrusion Detection Using Graphics Processors}}},
     shorttitle = {Gnort},
     doi = {10.1007/978-3-540-87403-4_7},
     abstract = {The constant increase in link speeds and number of threats poses challenges to network intrusion detection systems (NIDS), which must cope with higher traffic throughput and perform even more complex per-packet processing. In this paper, we present an intrusion detection system based on the Snort open-source NIDS that exploits the underutilized computational power of modern graphics cards to offload the costly pattern matching operations from the CPU, and thus increase the overall processing throughput. Our prototype system, called Gnort, achieved a maximum traffic processing throughput of 2.3 Gbit/s using synthetic network traces, while when monitoring real traffic using a commodity Ethernet interface, it outperformed unmodified Snort by a factor of two. The results suggest that modern graphics cards can be used effectively to speed up intrusion detection systems, as well as other systems that involve pattern matching operations.},
@@ -165,8 +141,7 @@
     author = {Vasiliadis, Giorgos and Antonatos, Spiros and Polychronakis, Michalis and Markatos, Evangelos P. and Ioannidis, Sotiris},
     month = sep,
     year = {2008},
-    pages = {116--134},
-    file = {Full Text PDF:/media/Fikri/TA/storage/N74TBKFK/Vasiliadis et al. - 2008 - Gnort High Performance Network Intrusion Detectio.pdf:application/pdf;Snapshot:/media/Fikri/TA/storage/7JCCHRDV/978-3-540-87403-4_7.html:text/html}
+    pages = {116--134}
 }
 @techreport{nist2007, 
     address = {Gaithersburg, MD, United States},
@@ -175,8 +150,7 @@
     timestamp = {2017-05-10T09:26:59Z},
     institution = {National Institute of Standards \& Technology},
     author = {Scarfone, Karen A. and Mell, Peter M.},
-    year = {2007},
-    file = {nistspecialpublication800-94.pdf:/media/Fikri/TA/storage/QCU3IJFU/nistspecialpublication800-94.pdf:application/pdf}
+    year = {2007}
 }
 @inproceedings{Sommer:2003:EBN:948109.948145,
     author = {Sommer, Robin and Paxson, Vern},
@@ -209,12 +183,11 @@
     month = oct,
     year = {2013},
     keywords = {Acceleration,Aho-Corasick,Algorithm design and analysis,Complexity theory,graphics processing unit,Graphics processing units,Instruction sets,parallel algorithm,pattern matching,Vectors},
-    pages = {1906--1916},
-    file = {lin2013.pdf:/media/Fikri/TA/storage/2F4WKH9R/lin2013.pdf:application/pdf}
+    pages = {1906--1916}
 }
 @article{ahoc1975,
     author = {Aho, Alfred V. and Corasick, Margaret J.},
-    title = {Efficient String Matching: An Aid to Bibliographic Search},
+    title = {{Efficient String Matching: An Aid to Bibliographic Search}},
     journal = {Communications of the ACM},
     issue_date = {June 1975},
     volume = {18},
@@ -344,7 +317,7 @@
 }
 @inproceedings{lindholm2001,
     author = {Lindholm, Erik and Kilgard, Mark J. and Moreton, Henry},
-    title = {A User-programmable Vertex Engine},
+    title = {{A User-programmable Vertex Engine}},
     booktitle = {Proceedings of the 28th Annual Conference on Computer Graphics and Interactive Techniques},
     series = {SIGGRAPH '01},
     year = {2001},
@@ -359,26 +332,19 @@
     keywords = {graphics hardware, graphics systems},
 } 
 @misc{cuda,
-    title = {CUDA Toolkit Documentation},
+    title = {{CUDA Toolkit Documentation}},
     pages = {19},
-    note = {\emph{nVidia Developer Zone - CUDA C Programming Guide v8.0}. Section 3.1.5},
+    author = {NVIDIA},
+    note = {\emph{NVIDIA Developer Zone - CUDA C Programming Guide v8.0}. Section 3.1.5},
     year = {2017},
     month = jan,
     url={http://docs.nvidia.com/cuda/pdf/CUDA_C_Programming_Guide.pdf},
     urldate = {2017-03-22},
 }
-@misc{snortfaq,
-    title={Snort Frequently Asked Questions},
-    url={https://www.snort.org/faq.html},
-    note={The Snort Project vol. 2.9.8.2},
-    year={2016},
-    urldate={2017-03-22},
-    publisher={Cisco}
-}
 @inproceedings{5358130, 
     author={E. Azimi and M. B. Ghaznavi-Ghoushchi and A. M. Rahmani}, 
     booktitle={2009 IEEE International Conference on Intelligent Computing and Intelligent Systems}, 
-    title={Implementation of simple SNORT processor for efficient Intrusion Detection systems}, 
+    title={{Implementation of Simple SNORT Processor for Efficient Intrusion Detection Systems}}, 
     year={2009}, 
     volume={3}, 
     pages={533-537}, 
@@ -431,3 +397,29 @@
     pages = {175--184},
     file = {smith2009.pdf:/media/Fikri/TA/storage/32SPVXII/smith2009.pdf:application/pdf}
 }
+@article{amdahl, 
+    title={Validity of the Single Processor Approach to Achieving Large Scale Computing Capabilities}, 
+    DOI={10.1145/1465482.1465560}, 
+    journal={Proceedings of the April 18-20, 1967, spring joint computer conference on - AFIPS 67 (Spring)}, 
+    author={Amdahl, Gene M.}, 
+    year={1967}
+}
+@article{gustafson, 
+    title={Reevaluating Amdahl's Law}, 
+    volume={31}, 
+    DOI={10.1145/42411.42415}, 
+    number={5}, 
+    journal={Communications of the ACM}, 
+    author={Gustafson, John L.}, 
+    year={1988}, 
+    month={Jan}, 
+    pages={532–533}
+}
+@book{os,
+    place={Hoboken, NJ}, 
+    title={Operating system concepts}, 
+    publisher={Wiley}, 
+    author={Silberschatz, Abraham and Galvin, Peter B. and Gagne, Greg}, 
+    year={2018}
+}
+@article{pungila_negru_2012, title={A Highly-Efficient Memory-Compression Approach for GPU-Accelerated Virus Signature Matching}, DOI={10.1007/978-3-642-33383-5_22}, journal={Lecture Notes in Computer Science Information Security}, author={Pungila, Ciprian and Negru, Viorel}, year={2012}, pages={354–369}}

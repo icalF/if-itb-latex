@@ -10,3 +10,24 @@ Here are some typical thoughts on search types:
 Hence, as usual in CS, there is no definite answer to the overall best. It is rather a matter of choosing the right tool for the job at hand.
 
 Another note on your worst-case reasoning: Do consider the kinds of searches required to create that worst-case and think thoroughly about whether these are really relevant in your case. For example, the O(mn) worst-case complexity of the Boyer-Moore algorithm stems from a search pattern and a text that each use only one character (like finding aaa in aaaaaaaaaaaaaaaaaaaaa) - do you really need to be fast for searches like that?
+
+## Notes on Parallelism
+### Performance consideration:
+- Splitting cost
+- Task dispatch cost
+- Combining/reducing cost
+- Locality
+
+### Rule of thumb: 
+![rule-of-thumb](https://blog.oio.de/wp-content/uploads/2016/01/stream_performance_image3.png)
+
+## Testing Tools
+- [Locust](http://locust.io)
+
+## Milestones
+- [x] Implementasi matcher
+- [ ] Nonblocking payload trf
+- [ ] Page lock
+- [ ] Compact and trim trie
+- [ ] Benchmark dataset
+- [ ] Live testing

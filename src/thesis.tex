@@ -9,46 +9,43 @@
 % Berkas ini berisi struktur utama dokumen LaTeX yang akan dibuat.
 %
 %--------------------------------------------------------------------%
-
 \documentclass[11pt, a4paper, onecolumn, oneside, final]{book}
 
 \input{config/if-itb-thesis.sty}
-\input{config/hyphenation.tex}
 
 \makeatletter
 
 \makeatother
 
-\bibliography{references}
+%\bibliography{references}
 
 \begin{document}
 
     %Basic configuration
-    \title{Pengembangan Pencocokan Paket Berbasis GPU pada SNORT NIDS}
+    \title{Peningkatan Kinerja Modul Pencocokan Pola dalam Sistem Deteksi Intrusi Snort Menggunakan GPU}
     \date{}
     \author{
-        Afrizal Fikri \\
-        NIM 13513004
+        AFRIZAL FIKRI \\
+        NIM : 13513004
     }
-
-    % \pagenumbering{roman}
-    % \setcounter{page}{0}
 
     \frontmatter
     \input{chapters/cover}
     \input{chapters/approval}
-    % \input{chapters/statement}
+    \input{chapters/statement}
 
     \pagestyle{plain}
 
-    % \input{chapters/abstract-id}
+    \input{chapters/abstract-id}
     % \input{chapters/abstract-en}
-    % \input{chapters/forewords}
+    \input{chapters/forewords}
 
     \titleformat*{\section}{\centering\bfseries\Large\MakeUpperCase}
     
     \tableofcontents
     \addcontentsline{toc}{chapter}{DAFTAR ISI} 
+    % \afterpage{\null\newpage}
+    % \addcontentsline{toc}{chapter}{DAFTAR LAMPIRAN}
     {%
         \let\oldnumberline\numberline%
         \renewcommand{\numberline}{\figurename~\oldnumberline}%
@@ -61,19 +58,6 @@
         \listoftables%
     }
     \addcontentsline{toc}{chapter}{DAFTAR TABEL}
-
-    % \titleformat*{\section}{\centering\bfseries\large\MakeUpperCase}
-
-    % \tableofcontents
-
-    % \addcontentsline{toc}{chapter}{\listfigurename}
-    % \listoffigures
-
-    % \addcontentsline{toc}{chapter}{\listtablename}
-    % \listoftables
-
-    % \titleformat*{\section}{\bfseries\Large}
-    % \pagenumbering{arabic}
 
     %----------------------------------------------------------------%
     % Konfigurasi Bab
@@ -91,29 +75,39 @@
     \input{chapters/chapter-1}
     \input{chapters/chapter-2}
     \input{chapters/chapter-3}
-    % \input{chapters/chapter-4}
-    % \input{chapters/chapter-5}
+    \input{chapters/chapter-4}
+    \input{chapters/chapter-5}
     %----------------------------------------------------------------%
 
     % Daftar pustaka
+    % Bibliography to Daftar Pustaka
     \renewcommand{\bibname}{Daftar Pustaka}
     \cleardoublepage
     \phantomsection
     \addcontentsline{toc}{chapter}{DAFTAR PUSTAKA}
-    \printbibliography[title=Daftar Pustaka]
-    % \bibliography{references}
-    % \bibliographystyle{apa}
+    %\printbibliography
+    \bibliography{references}
+    \bibliographystyle{apa}
 
+    \backmatter
     % Index
     \appendix
+    \addtocontents{toc}{\protect\setcounter{tocdepth}{-1}}
 
     \cleardoublepage
     \phantomsection
+    %\part*{Lampiran}
+    %\addcontentsline{toc}{part}{LAMPIRAN}
 
-    % \addcontentsline{toc}{part}{Lampiran}
-    % \part*{Lampiran}
+    % Setting judul appendix
+    \chapterfont{\Large}
+    \titleformat{\chapter}[hang]
+      {\Large\bfseries}
+      {\chaptertitlename\ \thechapter.\ }{0pt}
+        {\Large\bfseries}
+    \titlespacing*{\chapter}{0pt}{-25pt}{10pt}
 
-    % \input{chapters/appendix-1}
-    % \input{chapters/appendix-2}
+    %\input{chapters/appendix-1}
+    %\input{chapters/appendix-2}
 
 \end{document}

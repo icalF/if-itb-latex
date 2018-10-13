@@ -12,4 +12,9 @@ install:
     - pdflatex --version
 
 script:
-    - make install
+    - cd src
+    - sudo updmap-sys --enable Map=libertine.map
+    - pdflatex thesis
+    - bibtex thesis
+    - pdflatex thesis
+    - pdflatex thesis
